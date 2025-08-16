@@ -111,56 +111,69 @@ const Contributors = () => {
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-lg shadow-lg p-8 mb-8"
           >
+            {/* Repository Links at the top */}
+            <div className="mb-8">
+              <div className="flex flex-wrap gap-4 justify-center">
+                {projectInfo.repositories.map((repo, index) => (
+                  <a 
+                    key={index}
+                    href={repo.github_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 hover:border-gray-400 hover:shadow-sm transition-all duration-200 group"
+                  >
+                    <div className={`w-3 h-3 rounded-full mr-3 ${
+                      repo.type === 'backend' ? 'bg-green-500' :
+                      repo.type === 'frontend' ? 'bg-blue-500' : 'bg-purple-500'
+                    }`}></div>
+                    <span className="font-medium text-gray-900 group-hover:text-gray-700">
+                      {repo.name}
+                    </span>
+                    <svg className="w-4 h-4 ml-2 text-gray-400 group-hover:text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clipRule="evenodd" />
+                    </svg>
+                  </a>
+                ))}
+              </div>
+            </div>
             
             {/* Two Column Layout: Story + Top 10 Contributors */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               
               {/* Left Column: Project Creators Story - Takes 2/3 */}
               <div className="lg:col-span-2">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">🎉 The Story Behind POLLZ</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">The Story Behind POLLZ</h2>
                 
-                <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg overflow-hidden shadow-lg p-6">
+                <div className="rounded-lg overflow-hidden shadow-lg relative">
                   {projectInfo.project_creators?.map((creator, index) => (
                     <div key={index}>
-                      {creator.story && creator.story.split('\n\n').map((paragraph, idx) => (
-                        <p key={idx} className="text-gray-700 mb-4 leading-relaxed text-justify text-sm">
-                          {paragraph}
-                        </p>
-                      ))}
-                      
-                      {/* Creator Image - Smaller and inline */}
-                      <div className="my-6 flex justify-center">
+                      {/* Background Image with Text Overlay */}
+                      <div className="relative min-h-[400px]">
+                        {/* Background Image */}
                         <img 
                           src={pollzCreatorsImage} 
                           alt="POLLZ Creators - The Original Team" 
-                          className="max-w-full h-48 object-contain rounded-lg"
+                          className="absolute inset-0 w-full h-full object-cover rounded-lg"
                         />
-                      </div>
-                      
-                      <div className="mt-6 pt-6 border-t border-yellow-200">
-                        <div className="flex items-center justify-between flex-wrap gap-4">
-                          <div>
-                            <h3 className="font-bold text-lg text-gray-900 mb-1">{creator.name}</h3>
-                            <p className="text-sm text-gray-600">Driving OSS culture at BITS Pilani</p>
+                        
+                        {/* Dark Overlay for text readability */}
+                        <div className="absolute inset-0 bg-black bg-opacity-65 rounded-lg"></div>
+                        
+                        {/* Text Content Overlay */}
+                        <div className="relative z-10 p-8 h-full flex flex-col justify-center">
+                          <div className="rounded-lg p-6 backdrop-blur-[0.5px]">
+                            {creator.story && creator.story.split('\n\n').map((paragraph, idx) => (
+                              <p key={idx} className="text-white mb-2 leading-relaxed text-justify text-base font-medium drop-shadow-lg">
+                                {paragraph}
+                              </p>
+                            ))}
                           </div>
-                          <a 
-                            href={creator.github_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm flex items-center space-x-2"
-                          >
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clipRule="evenodd" />
-                            </svg>
-                            <span>Visit BITS ACM</span>
-                          </a>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-
               {/* Right Column: Top 10 Contributors - Takes 1/3 */}
               <div className="lg:col-span-1">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">🏆 Top 10 Contributors</h2>
@@ -229,44 +242,6 @@ const Contributors = () => {
               </div>
             </div>
 
-            {/* Repository Links */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Repository Structure</h2>
-                <a 
-                  href={projectInfo.github_org} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center space-x-1"
-                >
-                  <span>View Organization</span>
-                  <span>↗</span>
-                </a>
-              </div>
-              
-              <div className="flex flex-wrap gap-4">
-                {projectInfo.repositories.map((repo, index) => (
-                  <a 
-                    key={index}
-                    href={repo.github_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 hover:border-gray-400 hover:shadow-sm transition-all duration-200 group"
-                  >
-                    <div className={`w-3 h-3 rounded-full mr-3 ${
-                      repo.type === 'backend' ? 'bg-green-500' :
-                      repo.type === 'frontend' ? 'bg-blue-500' : 'bg-purple-500'
-                    }`}></div>
-                    <span className="font-medium text-gray-900 group-hover:text-gray-700">
-                      {repo.name}
-                    </span>
-                    <svg className="w-4 h-4 ml-2 text-gray-400 group-hover:text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clipRule="evenodd" />
-                    </svg>
-                  </a>
-                ))}
-              </div>
-            </div>
           </motion.div>
         )}
 
