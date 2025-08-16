@@ -6,6 +6,7 @@ import LandingPage from './pages/LandingPage';
 import SUElection from './pages/SUElection';
 import HuelVoting from './pages/HuelVoting';
 import DepartmentClubs from './pages/DepartmentClubs';
+import Contributors from './pages/Contributors';
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
               <Route path="/elections" element={<SUElection />} />
               <Route path="/huels" element={<HuelVoting />} />
               <Route path="/departments" element={<DepartmentClubs />} />
+              <Route path="/contributors" element={<Contributors />} />
             </Routes>
           </div>
         </Router>
