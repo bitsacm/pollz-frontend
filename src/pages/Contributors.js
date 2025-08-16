@@ -112,55 +112,119 @@ const Contributors = () => {
             className="bg-white rounded-lg shadow-lg p-8 mb-8"
           >
             
-            {/* Project Creators Story with integrated image */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">The Story Behind POLLZ</h2>
+            {/* Two Column Layout: Story + Top 10 Contributors */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               
-              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg overflow-hidden shadow-lg">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
-                  {/* Story Text - Takes 2/3 on large screens */}
-                  <div className="lg:col-span-2 p-8">
-                    {projectInfo.project_creators?.map((creator, index) => (
-                      <div key={index}>
-                        {creator.story && creator.story.split('\n\n').map((paragraph, idx) => (
-                          <p key={idx} className="text-gray-700 mb-4 leading-relaxed text-justify">
-                            {paragraph}
-                          </p>
-                        ))}
-                        
-                        <div className="mt-6 pt-6 border-t border-yellow-200">
-                          <div className="flex items-center justify-between flex-wrap gap-4">
-                            <div>
-                              <h3 className="font-bold text-lg text-gray-900 mb-1">{creator.name}</h3>
-                              <p className="text-sm text-gray-600">Driving OSS culture at BITS Pilani</p>
-                            </div>
-                            <a 
-                              href={creator.github_url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm flex items-center space-x-2"
-                            >
-                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clipRule="evenodd" />
-                              </svg>
-                              <span>Visit BITS ACM</span>
-                            </a>
+              {/* Left Column: Project Creators Story - Takes 2/3 */}
+              <div className="lg:col-span-2">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">🎉 The Story Behind POLLZ</h2>
+                
+                <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg overflow-hidden shadow-lg p-6">
+                  {projectInfo.project_creators?.map((creator, index) => (
+                    <div key={index}>
+                      {creator.story && creator.story.split('\n\n').map((paragraph, idx) => (
+                        <p key={idx} className="text-gray-700 mb-4 leading-relaxed text-justify text-sm">
+                          {paragraph}
+                        </p>
+                      ))}
+                      
+                      {/* Creator Image - Smaller and inline */}
+                      <div className="my-6 flex justify-center">
+                        <img 
+                          src={pollzCreatorsImage} 
+                          alt="POLLZ Creators - The Original Team" 
+                          className="max-w-full h-48 object-contain rounded-lg"
+                        />
+                      </div>
+                      
+                      <div className="mt-6 pt-6 border-t border-yellow-200">
+                        <div className="flex items-center justify-between flex-wrap gap-4">
+                          <div>
+                            <h3 className="font-bold text-lg text-gray-900 mb-1">{creator.name}</h3>
+                            <p className="text-sm text-gray-600">Driving OSS culture at BITS Pilani</p>
                           </div>
+                          <a 
+                            href={creator.github_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm flex items-center space-x-2"
+                          >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clipRule="evenodd" />
+                            </svg>
+                            <span>Visit BITS ACM</span>
+                          </a>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                  
-                  {/* Creator Image - Takes 1/3 on large screens */}
-                  <div className="lg:col-span-1 relative min-h-[300px] lg:min-h-full bg-gradient-to-br from-yellow-50 to-orange-50 flex items-center justify-center p-4">
-                    <div className="w-full h-full flex items-center justify-center">
-                      <img 
-                        src={pollzCreatorsImage} 
-                        alt="POLLZ Creators - The Original Team" 
-                        className="max-w-full max-h-full object-contain"
-                      />
                     </div>
-                  </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: Top 10 Contributors - Takes 1/3 */}
+              <div className="lg:col-span-1">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">🏆 Top 10 Contributors</h2>
+                
+                <div className="space-y-3">
+                  {(regularContributors.length > 0 ? regularContributors : contributors)
+                    .slice(0, 10)
+                    .map((contributor, index) => {
+                      const repoContribs = getRepoContributions(contributor, 'all');
+                      
+                      return (
+                        <motion.div
+                          key={contributor.email}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex items-center space-x-2">
+                            {/* Rank Badge */}
+                            <div className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${getRankBadgeColor(contributor.rank)}`}>
+                              {contributor.rank}
+                            </div>
+                            
+                            {/* Avatar */}
+                            <img
+                              src={contributor.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(contributor.name)}&background=f59e0b&color=1f2937`}
+                              alt={contributor.name}
+                              className="w-8 h-8 rounded-full bg-gray-200"
+                              onError={(e) => {
+                                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(contributor.name)}&background=f59e0b&color=1f2937`;
+                              }}
+                            />
+                            
+                            {/* Contributor Info */}
+                            <div className="flex-grow min-w-0">
+                              <h3 className="font-semibold text-sm text-gray-900 truncate">{contributor.name}</h3>
+                              <p className="text-xs text-gray-500 truncate">@{contributor.username}</p>
+                            </div>
+
+                            {/* Compact Stats */}
+                            <div className="flex flex-col items-end">
+                              <div className="text-sm font-bold text-theme-accent-yellow">{repoContribs.commits}</div>
+                              <div className="text-xs text-gray-500">commits</div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                </div>
+
+                {/* View All Contributors Link */}
+                <div className="mt-6 text-center">
+                  <button
+                    onClick={() => {
+                      document.querySelector('#all-contributors')?.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                      });
+                    }}
+                    className="px-4 py-2 bg-theme-accent-yellow text-theme-black rounded-lg hover:bg-theme-warm-yellow transition-colors text-sm font-medium"
+                  >
+                    View All Contributors →
+                  </button>
                 </div>
               </div>
             </div>
@@ -294,6 +358,7 @@ const Contributors = () => {
 
         {/* Contributors Section */}
         <motion.div
+          id="all-contributors"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
