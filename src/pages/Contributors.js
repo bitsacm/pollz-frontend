@@ -8,6 +8,7 @@ const Contributors = () => {
   const [contributors, setContributors] = useState([]);
   const [creators, setCreators] = useState([]);
   const [regularContributors, setRegularContributors] = useState([]);
+  const [allContributors, setAllContributors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedRepo, setSelectedRepo] = useState('all');
@@ -30,6 +31,22 @@ const Contributors = () => {
       setContributors(contributorsResponse.data.contributors || []);
       setCreators(contributorsResponse.data.creators || []);
       setRegularContributors(contributorsResponse.data.regular_contributors || []);
+      
+      // Merge creators with regular contributors and mark them as project creators
+      const creatorsWithFlag = (contributorsResponse.data.creators || []).map(creator => ({
+        ...creator,
+        isProjectCreator: true
+      }));
+      
+      const regularWithFlag = (contributorsResponse.data.regular_contributors || []).map(contributor => ({
+        ...contributor,
+        isProjectCreator: false
+      }));
+      
+      const mergedContributors = [...creatorsWithFlag, ...regularWithFlag]
+        .sort((a, b) => a.rank - b.rank);
+      
+      setAllContributors(mergedContributors);
     } catch (err) {
       setError('Failed to fetch contributors data');
       console.error('Error fetching contributors:', err);
@@ -71,6 +88,10 @@ const Contributors = () => {
       newExpanded.add(contributorEmail);
     }
     setExpandedContributors(newExpanded);
+  };
+
+  const isProjectCreator = (contributor) => {
+    return creators.some(creator => creator.email === contributor.email || creator.username === contributor.username);
   };
 
   if (loading) {
@@ -142,7 +163,7 @@ const Contributors = () => {
               
               {/* Left Column: Project Creators Story - Takes 2/3 */}
               <div className="lg:col-span-2">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">The Story Behind POLLZ</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">The Story Behind POLLZ X BITS ACM</h2>
                 
                 <div className="rounded-lg overflow-hidden shadow-lg relative">
                   {projectInfo.project_creators?.map((creator, index) => (
@@ -179,10 +200,10 @@ const Contributors = () => {
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">🏆 Top 10 Contributors</h2>
                 
                 <div className="space-y-3">
-                  {(regularContributors.length > 0 ? regularContributors : contributors)
-                    .slice(0, 10)
-                    .map((contributor, index) => {
+                  {allContributors.length > 0 ? 
+                    allContributors.slice(0, 10).map((contributor, index) => {
                       const repoContribs = getRepoContributions(contributor, 'all');
+                      const isCreator = contributor.isProjectCreator || isProjectCreator(contributor);
                       
                       return (
                         <motion.div
@@ -190,19 +211,31 @@ const Contributors = () => {
                           initial={{ opacity: 0, x: 20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.1 }}
-                          className="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow"
+                          className={`border rounded-lg p-3 hover:shadow-md transition-shadow ${
+                            isCreator 
+                              ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-300' 
+                              : 'bg-white border-gray-200'
+                          }`}
                         >
                           <div className="flex items-center space-x-2">
-                            {/* Rank Badge */}
-                            <div className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${getRankBadgeColor(contributor.rank)}`}>
-                              {contributor.rank}
-                            </div>
+                            {/* Rank Badge or Crown */}
+                            {isCreator ? (
+                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-yellow-500 text-yellow-900 text-xs">
+                                👑
+                              </div>
+                            ) : (
+                              <div className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${getRankBadgeColor(contributor.rank)}`}>
+                                {contributor.rank}
+                              </div>
+                            )}
                             
                             {/* Avatar */}
                             <img
                               src={contributor.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(contributor.name)}&background=f59e0b&color=1f2937`}
                               alt={contributor.name}
-                              className="w-8 h-8 rounded-full bg-gray-200"
+                              className={`w-8 h-8 rounded-full bg-gray-200 ${
+                                isCreator ? 'border-2 border-yellow-400' : ''
+                              }`}
                               onError={(e) => {
                                 e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(contributor.name)}&background=f59e0b&color=1f2937`;
                               }}
@@ -210,7 +243,14 @@ const Contributors = () => {
                             
                             {/* Contributor Info */}
                             <div className="flex-grow min-w-0">
-                              <h3 className="font-semibold text-sm text-gray-900 truncate">{contributor.name}</h3>
+                              <div className="flex items-center space-x-1">
+                                <h3 className="font-semibold text-sm text-gray-900 truncate">{contributor.name}</h3>
+                                {isCreator && (
+                                  <span className="text-xs font-medium text-yellow-700 bg-yellow-200 px-1 rounded">
+                                    (Project Creator)
+                                  </span>
+                                )}
+                              </div>
                               <p className="text-xs text-gray-500 truncate">@{contributor.username}</p>
                             </div>
 
@@ -222,7 +262,72 @@ const Contributors = () => {
                           </div>
                         </motion.div>
                       );
-                    })}
+                    }) :
+                    (regularContributors.length > 0 ? regularContributors : contributors)
+                      .slice(0, 10)
+                      .map((contributor, index) => {
+                        const repoContribs = getRepoContributions(contributor, 'all');
+                        const isCreator = isProjectCreator(contributor);
+                        
+                        return (
+                          <motion.div
+                            key={contributor.email}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className={`border rounded-lg p-3 hover:shadow-md transition-shadow ${
+                              isCreator 
+                                ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-300' 
+                                : 'bg-white border-gray-200'
+                            }`}
+                          >
+                            <div className="flex items-center space-x-2">
+                              {/* Rank Badge or Crown */}
+                              {isCreator ? (
+                                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-yellow-500 text-yellow-900 text-xs">
+                                  👑
+                                </div>
+                              ) : (
+                                <div className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${getRankBadgeColor(contributor.rank)}`}>
+                                  {contributor.rank}
+                                </div>
+                              )}
+                              
+                              {/* Avatar */}
+                              <img
+                                src={contributor.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(contributor.name)}&background=f59e0b&color=1f2937`}
+                                alt={contributor.name}
+                                className={`w-8 h-8 rounded-full bg-gray-200 ${
+                                  isCreator ? 'border-2 border-yellow-400' : ''
+                                }`}
+                                onError={(e) => {
+                                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(contributor.name)}&background=f59e0b&color=1f2937`;
+                                }}
+                              />
+                              
+                              {/* Contributor Info */}
+                              <div className="flex-grow min-w-0">
+                                <div className="flex items-center space-x-1">
+                                  <h3 className="font-semibold text-sm text-gray-900 truncate">{contributor.name}</h3>
+                                  {isCreator && (
+                                    <span className="text-xs font-medium text-yellow-700 bg-yellow-200 px-1 rounded">
+                                      (Project Creator)
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-xs text-gray-500 truncate">@{contributor.username}</p>
+                              </div>
+
+                              {/* Compact Stats */}
+                              <div className="flex flex-col items-end">
+                                <div className="text-sm font-bold text-theme-accent-yellow">{repoContribs.commits}</div>
+                                <div className="text-xs text-gray-500">commits</div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        );
+                      })
+                  }
                 </div>
 
                 {/* View All Contributors Link */}
@@ -245,91 +350,6 @@ const Contributors = () => {
           </motion.div>
         )}
 
-        {/* Repository Creators Section */}
-        {creators.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-lg shadow-lg p-8 mb-8"
-          >
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-              👑 Repository Creators & Project Initiators
-            </h2>
-            
-            {creators.map((creator, index) => {
-              const repoContribs = getRepoContributions(creator, selectedRepo);
-              
-              return (
-                <motion.div
-                  key={creator.username}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="border-2 border-yellow-300 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-6 mb-4"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      {/* Creator Crown */}
-                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-yellow-500 text-yellow-900 text-lg font-bold">
-                        👑
-                      </div>
-                      
-                      {/* Avatar */}
-                      <img
-                        src={creator.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=f59e0b&color=1f2937`}
-                        alt={creator.name}
-                        className="w-16 h-16 rounded-full bg-gray-200 border-4 border-yellow-400"
-                        onError={(e) => {
-                          e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=f59e0b&color=1f2937`;
-                        }}
-                      />
-                      
-                      {/* Creator Info */}
-                      <div>
-                        <h3 className="font-bold text-xl text-gray-900">{creator.name}</h3>
-                        <p className="text-sm text-gray-600">@{creator.username}</p>
-                        <p className="text-sm font-semibold text-yellow-700">
-                          🎯 Created: {creator.created_repos?.join(', ')} repositories
-                        </p>
-                        {creator.github_url && (
-                          <a 
-                            href={creator.github_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-xs text-blue-600 hover:text-blue-800 font-medium"
-                          >
-                            View GitHub Profile →
-                          </a>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Creator Stats */}
-                    <div className="flex space-x-4 text-center">
-                      <div>
-                        <div className="text-2xl font-bold text-yellow-600">{repoContribs.commits}</div>
-                        <div className="text-xs text-gray-500">Commits</div>
-                      </div>
-                      <div>
-                        <div className="text-xl font-bold text-green-600">+{repoContribs.additions?.toLocaleString() || 0}</div>
-                        <div className="text-xs text-gray-500">Lines Added</div>
-                      </div>
-                      <div>
-                        <div className="text-xl font-bold text-red-600">-{repoContribs.deletions?.toLocaleString() || 0}</div>
-                        <div className="text-xs text-gray-500">Lines Deleted</div>
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-purple-600">{repoContribs.merged_prs}</div>
-                        <div className="text-xs text-gray-500">Merged PRs</div>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </motion.div>
-        )}
 
         {/* Contributors Section */}
         <motion.div
@@ -341,7 +361,7 @@ const Contributors = () => {
         >
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
-              {regularContributors.length > 0 ? 'Other Contributors' : 'All Contributors'}
+              All Contributors
             </h2>
             
             {/* Repository Filter */}
@@ -357,12 +377,13 @@ const Contributors = () => {
             </select>
           </div>
 
-          {(regularContributors.length > 0 ? regularContributors : contributors).length === 0 ? (
+          {allContributors.length === 0 ? (
             <p className="text-center text-gray-500 py-8">No contributors found</p>
           ) : (
             <div className="space-y-4">
-              {(regularContributors.length > 0 ? regularContributors : contributors).map((contributor, index) => {
+              {allContributors.map((contributor, index) => {
                 const repoContribs = getRepoContributions(contributor, selectedRepo);
+                const isCreator = contributor.isProjectCreator || isProjectCreator(contributor);
                 
                 return (
                   <motion.div
@@ -370,20 +391,32 @@ const Contributors = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+                    className={`border rounded-lg p-6 hover:shadow-md transition-shadow ${
+                      isCreator 
+                        ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-300' 
+                        : 'border-gray-200'
+                    }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        {/* Rank Badge */}
-                        <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold ${getRankBadgeColor(contributor.rank)}`}>
-                          {contributor.rank}
-                        </div>
+                        {/* Rank Badge or Crown */}
+                        {isCreator ? (
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-500 text-yellow-900 text-sm">
+                            👑
+                          </div>
+                        ) : (
+                          <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold ${getRankBadgeColor(contributor.rank)}`}>
+                            {contributor.rank}
+                          </div>
+                        )}
                         
                         {/* Avatar */}
                         <img
                           src={contributor.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(contributor.name)}&background=f59e0b&color=1f2937`}
                           alt={contributor.name}
-                          className="w-12 h-12 rounded-full bg-gray-200"
+                          className={`w-12 h-12 rounded-full bg-gray-200 ${
+                            isCreator ? 'border-2 border-yellow-400' : ''
+                          }`}
                           onError={(e) => {
                             e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(contributor.name)}&background=f59e0b&color=1f2937`;
                           }}
@@ -391,7 +424,14 @@ const Contributors = () => {
                         
                         {/* Contributor Info */}
                         <div>
-                          <h3 className="font-semibold text-lg text-gray-900">{contributor.name}</h3>
+                          <div className="flex items-center space-x-2">
+                            <h3 className="font-semibold text-lg text-gray-900">{contributor.name}</h3>
+                            {isCreator && (
+                              <span className="text-sm font-medium text-yellow-700 bg-yellow-200 px-2 py-1 rounded">
+                                (Project Creator)
+                              </span>
+                            )}
+                          </div>
                           <p className="text-sm text-gray-500">@{contributor.username}</p>
                           {contributor.github_url && (
                             <a 
@@ -448,7 +488,9 @@ const Contributors = () => {
 
                     {/* Repository Breakdown (when showing all and expanded) */}
                     {selectedRepo === 'all' && expandedContributors.has(contributor.email) && (
-                      <div className="mt-4 pt-4 border-t border-gray-100">
+                      <div className={`mt-4 pt-4 border-t border-gray-100 ${
+                        isCreator ? 'bg-yellow-100 -mx-6 -mb-6 px-6 pb-6 rounded-b-lg' : ''
+                      }`}>
                         <p className="text-sm text-gray-600 mb-2">Contributions by repository:</p>
                         <div className="grid grid-cols-3 gap-4 text-sm">
                           <div className="text-center p-3 bg-green-50 rounded">
@@ -479,6 +521,14 @@ const Contributors = () => {
                             </div>
                           </div>
                         </div>
+                        
+                        {isCreator && (
+                          <div className="mt-4 p-3 bg-yellow-200 rounded-lg">
+                            <p className="text-sm font-semibold text-yellow-800 flex items-center">
+                              👑 <span className="ml-2">Project Creator - Created: {contributor.created_repos?.join(', ')} repositories</span>
+                            </p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </motion.div>
