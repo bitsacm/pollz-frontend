@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-theme-accent-yellow hover:bg-theme-warm-yellow text-theme-black font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  
+  .btn-secondary {
+    @apply bg-theme-light-gray hover:bg-gray-300 text-theme-black font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  
+  .card {
+    @apply bg-theme-light-gray rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300;
+  }
+  
+  .gradient-overlay {
+    background: linear-gradient(180deg, rgba(26,26,26,0.9) 0%, rgba(45,45,45,0.7) 50%, rgba(26,26,26,0.9) 100%);
+  }
+}
