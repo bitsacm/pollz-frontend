@@ -203,7 +203,7 @@ const Contributors = () => {
                   {allContributors.length > 0 ? 
                     allContributors.slice(0, 10).map((contributor, index) => {
                       const repoContribs = getRepoContributions(contributor, 'all');
-                      const isCreator = contributor.isProjectCreator || isProjectCreator(contributor);
+                      const isCreator = contributor.isProjectCreator;
                       
                       return (
                         <motion.div
@@ -267,7 +267,7 @@ const Contributors = () => {
                       .slice(0, 10)
                       .map((contributor, index) => {
                         const repoContribs = getRepoContributions(contributor, 'all');
-                        const isCreator = isProjectCreator(contributor);
+                        const isCreator = false; // In fallback, we don't have the flag, so default to false
                         
                         return (
                           <motion.div
@@ -383,7 +383,7 @@ const Contributors = () => {
             <div className="space-y-4">
               {allContributors.map((contributor, index) => {
                 const repoContribs = getRepoContributions(contributor, selectedRepo);
-                const isCreator = contributor.isProjectCreator || isProjectCreator(contributor);
+                const isCreator = contributor.isProjectCreator;
                 
                 return (
                   <motion.div
