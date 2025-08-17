@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 
 // The backend URL is now defined directly for this component.
-const BACKEND_URL = process.env.BACKEND_URL;
+const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 const GoogleAuthButton = () => {
   // Destructure the login function from your custom AuthContext
@@ -70,7 +70,7 @@ const GoogleAuthButton = () => {
     const idToken = response.credential;
     try {
       // Send the ID token to your backend for verification and authentication
-      const backendResponse = await axios.post(`${BACKEND_URL}/api/main/auth/google-login/`, {
+      const backendResponse = await axios.post(`${BACKEND_URL}/main/auth/google-login/`, {
         id_token: idToken,
       });
       const data = backendResponse.data;
