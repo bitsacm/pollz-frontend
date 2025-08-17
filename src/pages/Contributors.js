@@ -10,43 +10,104 @@ const Contributors = () => {
   const [regularContributors, setRegularContributors] = useState([]);
   const [allContributors, setAllContributors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [detailsLoaded, setDetailsLoaded] = useState(new Set());
+  const [contributorDetails, setContributorDetails] = useState({});
+  const [loadingStats, setLoadingStats] = useState({
+    commits: new Set(),
+    lines: new Set()
+  });
+  const [statsLoaded, setStatsLoaded] = useState({
+    commits: new Set(),
+    lines: new Set()
+  });
   const [error, setError] = useState(null);
   const [selectedRepo, setSelectedRepo] = useState('all');
   const [expandedContributors, setExpandedContributors] = useState(new Set());
 
   useEffect(() => {
-    fetchContributorsData();
+    fetchBasicContributorsData();
   }, []);
 
-  const fetchContributorsData = async () => {
+  useEffect(() => {
+    // Load stats progressively for top 10 contributors after basic data loads
+    if (allContributors.length > 0 && statsLoaded.commits.size === 0) {
+      const topContributors = allContributors.slice(0, 10);
+      const usernames = topContributors.map(c => c.username);
+      
+      // Load commits first (fastest)
+      loadContributorStats('commits', usernames);
+      
+      // Then load lines after a short delay
+      setTimeout(() => loadContributorStats('lines', usernames), 500);
+    }
+  }, [allContributors]);
+
+  const fetchBasicContributorsData = async () => {
     try {
       setLoading(true);
       
-      const [projectResponse, contributorsResponse] = await Promise.all([
-        api.get('/main/contributions/project-info/'),
-        api.get('/main/contributions/github-contributors/')
-      ]);
+      // Try new basic endpoint first, fallback to original if it fails
+      let contributorsData = null;
+      let projectData = null;
       
-      setProjectInfo(projectResponse.data);
-      setContributors(contributorsResponse.data.contributors || []);
-      setCreators(contributorsResponse.data.creators || []);
-      setRegularContributors(contributorsResponse.data.regular_contributors || []);
+      try {
+        // Fetch basic info - much faster!
+        const [projectResponse, contributorsResponse] = await Promise.all([
+          api.get('/main/contributions/project-info/'),
+          api.get('/main/contributions/github-contributors-basic/')
+        ]);
+        
+        projectData = projectResponse.data;
+        contributorsData = contributorsResponse.data;
+      } catch (basicErr) {
+        console.warn('Basic endpoint failed, trying original endpoint:', basicErr);
+        
+        // Fallback to original endpoint
+        try {
+          const [projectResponse, contributorsResponse] = await Promise.all([
+            api.get('/main/contributions/project-info/'),
+            api.get('/main/contributions/github-contributors/')
+          ]);
+          
+          projectData = projectResponse.data;
+          contributorsData = contributorsResponse.data;
+        } catch (fallbackErr) {
+          throw new Error('Both endpoints failed');
+        }
+      }
       
-      // Merge creators with regular contributors and mark them as project creators
-      const creatorsWithFlag = (contributorsResponse.data.creators || []).map(creator => ({
-        ...creator,
-        isProjectCreator: true
-      }));
+      setProjectInfo(projectData);
       
-      const regularWithFlag = (contributorsResponse.data.regular_contributors || []).map(contributor => ({
+      const basicContributors = contributorsData.contributors || [];
+      const basicCreators = contributorsData.creators || [];
+      const basicRegular = contributorsData.regular_contributors || [];
+      
+      // Initialize with basic data
+      const contributorsWithDefaults = basicContributors.map(contributor => ({
         ...contributor,
-        isProjectCreator: false
+        // Default values for details - will be updated when loaded
+        total_commits: contributor.contributions_count || contributor.total_commits || 0,
+        total_additions: contributor.total_additions || 0,
+        total_deletions: contributor.total_deletions || 0,
+        contributions: contributor.contributions || {
+          backend: { commits: 0, additions: 0, deletions: 0 },
+          frontend: { commits: 0, additions: 0, deletions: 0 },
+          websocket: { commits: 0, additions: 0, deletions: 0 }
+        },
+        isProjectCreator: contributor.is_creator || contributor.isProjectCreator || false,
+        detailsLoading: false,
+        rank: contributor.rank || 0
       }));
       
-      const mergedContributors = [...creatorsWithFlag, ...regularWithFlag]
-        .sort((a, b) => a.rank - b.rank);
+      setContributors(contributorsWithDefaults);
+      setCreators(basicCreators);
+      setRegularContributors(basicRegular);
+      setAllContributors(contributorsWithDefaults);
       
-      setAllContributors(mergedContributors);
+      // Initial ranking calculation
+      setTimeout(() => recalculateRankings(), 100);
+      
     } catch (err) {
       setError('Failed to fetch contributors data');
       console.error('Error fetching contributors:', err);
@@ -55,21 +116,136 @@ const Contributors = () => {
     }
   };
 
+  const loadContributorStats = async (statType, usernames) => {
+    if (!usernames || usernames.length === 0) return;
+    
+    try {
+      // Mark these stats as loading for these users
+      setLoadingStats(prev => ({
+        ...prev,
+        [statType]: new Set([...prev[statType], ...usernames])
+      }));
+      
+      // Build query string
+      const queryString = usernames.map(u => `username=${u}`).join('&');
+      const endpoint = `/main/contributions/github-contributors-${statType}/?${queryString}`;
+      
+      try {
+        const response = await api.get(endpoint);
+        
+        if (response.data && response.data.details) {
+          const details = response.data.details;
+          
+          // Update allContributors with this specific stat type
+          setAllContributors(prev => prev.map(contributor => {
+            if (details[contributor.username]) {
+              const statData = details[contributor.username];
+              return {
+                ...contributor,
+                ...statData, // Merge the new stat data
+                [`${statType}Loading`]: false
+              };
+            }
+            return contributor;
+          }));
+          
+          // Mark these stats as loaded
+          setStatsLoaded(prev => ({
+            ...prev,
+            [statType]: new Set([...prev[statType], ...usernames])
+          }));
+          
+          // Recalculate rankings after stats are updated
+          setTimeout(() => recalculateRankings(), 100);
+        }
+      } catch (apiErr) {
+        console.warn(`${statType} endpoint failed, skipping for now:`, apiErr);
+        // Don't throw error, just mark as not loading so UI doesn't get stuck
+      }
+      
+    } catch (err) {
+      console.error(`Error loading ${statType} stats:`, err);
+    } finally {
+      // Remove from loading state
+      setLoadingStats(prev => ({
+        ...prev,
+        [statType]: new Set([...prev[statType]].filter(u => !usernames.includes(u)))
+      }));
+    }
+  };
+
+  const loadContributorDetails = async (usernames) => {
+    if (!usernames || usernames.length === 0) return;
+    
+    // Load each stat type separately for immediate feedback
+    await loadContributorStats('commits', usernames);
+    await loadContributorStats('lines', usernames);
+  };
+
+  const calculateScore = (contributor) => {
+    const totalLines = (contributor.total_additions || 0) + (contributor.total_deletions || 0);
+    const linesScore = totalLines * 0.1;
+    const commitsScore = (contributor.total_commits || 0) * 1;
+    const creatorBonus = contributor.isProjectCreator ? 100 : 0;
+    
+    return linesScore + commitsScore + creatorBonus;
+  };
+
+  const recalculateRankings = () => {
+    setAllContributors(prev => {
+      // Calculate scores for all contributors
+      const contributorsWithScores = prev.map(contributor => ({
+        ...contributor,
+        score: calculateScore(contributor)
+      }));
+      
+      // Sort by score
+      contributorsWithScores.sort((a, b) => b.score - a.score);
+      
+      // Assign new ranks
+      return contributorsWithScores.map((contributor, index) => ({
+        ...contributor,
+        rank: index + 1
+      }));
+    });
+  };
+
+  const handleExpandContributor = async (contributor) => {
+    const username = contributor.username;
+    
+    // Toggle expansion
+    const newExpanded = new Set(expandedContributors);
+    if (newExpanded.has(username)) {
+      newExpanded.delete(username);
+    } else {
+      newExpanded.add(username);
+      
+      // Load individual stats if not already loaded
+      const statsToLoad = ['commits', 'lines'];
+      for (const statType of statsToLoad) {
+        if (!statsLoaded[statType].has(username)) {
+          loadContributorStats(statType, [username]);
+          // Small delay between requests to show progressive loading
+          await new Promise(resolve => setTimeout(resolve, 200));
+        }
+      }
+    }
+    setExpandedContributors(newExpanded);
+  };
+
   const getRepoContributions = (contributor, repoType) => {
     if (repoType === 'all') {
       return {
         commits: contributor.total_commits,
         additions: contributor.total_additions,
-        deletions: contributor.total_deletions,
-        merged_prs: contributor.total_merged_prs
+        deletions: contributor.total_deletions
       };
     }
     const repoData = contributor.contributions[repoType];
     return {
       commits: repoData.commits,
       additions: repoData.additions,
-      deletions: repoData.deletions,
-      merged_prs: repoData.merged_prs
+      deletions: repoData.deletions
     };
   };
 
@@ -81,18 +257,29 @@ const Contributors = () => {
   };
 
   const toggleContributorExpansion = (contributorEmail) => {
-    const newExpanded = new Set(expandedContributors);
-    if (newExpanded.has(contributorEmail)) {
-      newExpanded.delete(contributorEmail);
-    } else {
-      newExpanded.add(contributorEmail);
-    }
-    setExpandedContributors(newExpanded);
+    handleExpandContributor({ username: contributorEmail });
   };
 
   const isProjectCreator = (contributor) => {
     return creators.some(creator => creator.email === contributor.email || creator.username === contributor.username);
   };
+
+  const SkeletonLoader = ({ className = "" }) => (
+    <div className={`animate-pulse bg-gray-200 rounded ${className}`}></div>
+  );
+
+  const StatDisplay = ({ value, label, isLoading, className = "" }) => (
+    <div className="text-center">
+      {isLoading ? (
+        <div className="text-sm text-gray-400 animate-pulse">Loading...</div>
+      ) : (
+        <div className={`text-2xl font-bold mb-1 ${className}`}>
+          {value !== undefined && value !== null ? value : "0"}
+        </div>
+      )}
+      <div className="text-xs text-gray-500">{label}</div>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -111,7 +298,7 @@ const Contributors = () => {
         <div className="text-center text-red-600">
           <p className="text-xl">{error}</p>
           <button 
-            onClick={fetchContributorsData}
+            onClick={fetchBasicContributorsData}
             className="mt-4 px-4 py-2 bg-theme-accent-yellow text-theme-black rounded hover:bg-theme-warm-yellow"
           >
             Retry
@@ -256,7 +443,13 @@ const Contributors = () => {
 
                             {/* Compact Stats */}
                             <div className="flex flex-col items-end">
-                              <div className="text-sm font-bold text-theme-accent-yellow">{repoContribs.commits}</div>
+                              {loadingStats.commits.has(contributor.username) ? (
+                                <div className="text-xs text-gray-400 animate-pulse">Loading...</div>
+                              ) : (
+                                <div className="text-sm font-bold text-theme-accent-yellow">
+                                  {repoContribs.commits || 0}
+                                </div>
+                              )}
                               <div className="text-xs text-gray-500">commits</div>
                             </div>
                           </div>
@@ -320,7 +513,13 @@ const Contributors = () => {
 
                               {/* Compact Stats */}
                               <div className="flex flex-col items-end">
-                                <div className="text-sm font-bold text-theme-accent-yellow">{repoContribs.commits}</div>
+                                {loadingStats.commits.has(contributor.username) ? (
+                                  <div className="text-xs text-gray-400 animate-pulse">Loading...</div>
+                                ) : (
+                                  <div className="text-sm font-bold text-theme-accent-yellow">
+                                    {repoContribs.commits || 0}
+                                  </div>
+                                )}
                                 <div className="text-xs text-gray-500">commits</div>
                               </div>
                             </div>
@@ -360,9 +559,22 @@ const Contributors = () => {
           className="bg-white rounded-lg shadow-lg p-8"
         >
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              All Contributors
-            </h2>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                All Contributors
+              </h2>
+              <p className="text-sm text-gray-600 mt-1">
+                (Ranked by: Lines×0.1 + Commits×1 + Creator Bonus)
+              </p>
+              {(loadingStats.commits.size > 0 || loadingStats.lines.size > 0) && (
+                <p className="text-sm text-gray-500 mt-2">
+                  Loading stats... 
+                  {loadingStats.commits.size > 0 && ' commits'}
+                  {loadingStats.lines.size > 0 && ' lines'}
+                  {' '}for {Math.max(loadingStats.commits.size, loadingStats.lines.size)} contributors
+                </p>
+              )}
+            </div>
             
             {/* Repository Filter */}
             <select
@@ -448,46 +660,57 @@ const Contributors = () => {
 
                       {/* Contribution Stats */}
                       <div className="flex items-center space-x-4">
-                        <div className="flex space-x-4 text-center">
-                          <div>
-                            <div className="text-2xl font-bold text-theme-accent-yellow">{repoContribs.commits}</div>
-                            <div className="text-xs text-gray-500">Commits</div>
-                          </div>
-                          <div>
-                            <div className="text-xl font-bold text-green-600">+{repoContribs.additions?.toLocaleString() || 0}</div>
-                            <div className="text-xs text-gray-500">Lines Added</div>
-                          </div>
-                          <div>
-                            <div className="text-xl font-bold text-red-600">-{repoContribs.deletions?.toLocaleString() || 0}</div>
-                            <div className="text-xs text-gray-500">Lines Deleted</div>
-                          </div>
-                          <div>
-                            <div className="text-2xl font-bold text-purple-600">{repoContribs.merged_prs}</div>
-                            <div className="text-xs text-gray-500">Merged PRs</div>
-                          </div>
+                        <div className="flex space-x-6">
+                          <StatDisplay 
+                            value={repoContribs.commits}
+                            label="Commits"
+                            isLoading={loadingStats.commits.has(contributor.username)}
+                            className="text-theme-accent-yellow"
+                          />
+                          <StatDisplay 
+                            value={repoContribs.additions ? `+${repoContribs.additions.toLocaleString()}` : '+0'}
+                            label="Lines Added"
+                            isLoading={loadingStats.lines.has(contributor.username)}
+                            className="text-green-600 text-xl"
+                          />
+                          <StatDisplay 
+                            value={repoContribs.deletions ? `-${repoContribs.deletions.toLocaleString()}` : '-0'}
+                            label="Lines Deleted"
+                            isLoading={loadingStats.lines.has(contributor.username)}
+                            className="text-red-600 text-xl"
+                          />
                         </div>
                         
                         {/* View More Toggle Button */}
                         {selectedRepo === 'all' && (
                           <button
-                            onClick={() => toggleContributorExpansion(contributor.email)}
+                            onClick={() => toggleContributorExpansion(contributor.username)}
                             className="ml-4 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors flex items-center space-x-1"
+                            disabled={loadingStats.commits.has(contributor.username) || 
+                                     loadingStats.lines.has(contributor.username)}
                           >
-                            <span>{expandedContributors.has(contributor.email) ? 'Hide' : 'View More'}</span>
-                            <svg 
-                              className={`w-4 h-4 transition-transform ${expandedContributors.has(contributor.email) ? 'rotate-180' : ''}`} 
-                              fill="currentColor" 
-                              viewBox="0 0 20 20"
-                            >
-                              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                            </svg>
+                            <span>
+                              {(loadingStats.commits.has(contributor.username) || 
+                                loadingStats.lines.has(contributor.username)) ? 'Loading...' 
+                               : expandedContributors.has(contributor.username) ? 'Hide' : 'View More'}
+                            </span>
+                            {!(loadingStats.commits.has(contributor.username) || 
+                               loadingStats.lines.has(contributor.username)) && (
+                              <svg 
+                                className={`w-4 h-4 transition-transform ${expandedContributors.has(contributor.username) ? 'rotate-180' : ''}`} 
+                                fill="currentColor" 
+                                viewBox="0 0 20 20"
+                              >
+                                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                              </svg>
+                            )}
                           </button>
                         )}
                       </div>
                     </div>
 
                     {/* Repository Breakdown (when showing all and expanded) */}
-                    {selectedRepo === 'all' && expandedContributors.has(contributor.email) && (
+                    {selectedRepo === 'all' && expandedContributors.has(contributor.username) && (
                       <div className={`mt-4 pt-4 border-t border-gray-100 ${
                         isCreator ? 'bg-yellow-100 -mx-6 -mb-6 px-6 pb-6 rounded-b-lg' : ''
                       }`}>
@@ -499,7 +722,6 @@ const Contributors = () => {
                               <div>{contributor.contributions.backend.commits} commits</div>
                               <div className="text-green-600">+{contributor.contributions.backend.additions}</div>
                               <div className="text-red-600">-{contributor.contributions.backend.deletions}</div>
-                              <div className="text-purple-600">{contributor.contributions.backend.merged_prs} merged PRs</div>
                             </div>
                           </div>
                           <div className="text-center p-3 bg-blue-50 rounded">
@@ -508,7 +730,6 @@ const Contributors = () => {
                               <div>{contributor.contributions.frontend.commits} commits</div>
                               <div className="text-green-600">+{contributor.contributions.frontend.additions}</div>
                               <div className="text-red-600">-{contributor.contributions.frontend.deletions}</div>
-                              <div className="text-purple-600">{contributor.contributions.frontend.merged_prs} merged PRs</div>
                             </div>
                           </div>
                           <div className="text-center p-3 bg-purple-50 rounded">
@@ -517,7 +738,6 @@ const Contributors = () => {
                               <div>{contributor.contributions.websocket.commits} commits</div>
                               <div className="text-green-600">+{contributor.contributions.websocket.additions}</div>
                               <div className="text-red-600">-{contributor.contributions.websocket.deletions}</div>
-                              <div className="text-purple-600">{contributor.contributions.websocket.merged_prs} merged PRs</div>
                             </div>
                           </div>
                         </div>
