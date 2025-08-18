@@ -10,21 +10,21 @@ const ChatMessage = ({ message }) => {
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-lg p-3 shadow-lg"
+        className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-lg p-2 shadow-md border-l-4 border-yellow-500"
       >
-        <div className="flex items-start justify-between mb-1">
-          <div className="flex items-center">
-            <FiDollarSign className="mr-1" />
-            <span className="font-bold">{message.username}</span>
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center space-x-1">
+            <FiDollarSign className="text-sm" />
+            <span className="font-bold text-sm">{message.username}</span>
+            <span className="text-xs text-yellow-100">
+              {new Date(message.created_at).toLocaleTimeString()}
+            </span>
           </div>
-          <span className="bg-white text-orange-600 px-2 py-1 rounded text-sm font-bold">
+          <span className="bg-white text-orange-600 px-2 py-0.5 rounded text-xs font-bold">
             ₹{message.amount}
           </span>
         </div>
-        <p className="text-white font-medium">{message.message}</p>
-        <span className="text-xs text-yellow-100">
-          {new Date(message.created_at).toLocaleTimeString()}
-        </span>
+        <p className="text-white text-sm font-medium">{message.message}</p>
       </motion.div>
     );
   }

@@ -24,6 +24,28 @@ cp .env.example .env
 # Edit .env with your API endpoints
 ```
 
+### Razorpay Integration (For SuperChat payments)
+
+1. **Get Razorpay Public Key:**
+   - Visit [Razorpay Dashboard](https://dashboard.razorpay.com/)
+   - Go to **Account & Settings** → **API Keys**
+   - Copy the **Key ID** (public key - safe to use in frontend)
+   - **Note:** Never put the Key Secret in frontend code!
+
+2. **Configure Frontend Environment:**
+```bash
+# Add to your .env file
+REACT_APP_RAZORPAY_KEY_ID=rzp_test_your_key_id_here
+```
+
+3. **Testing Payments Locally:**
+   - Ensure your backend is running with proper Razorpay configuration
+   - Use ngrok to expose your backend (see backend README)
+   - Use Razorpay test cards for testing:
+     - **Success:** `4111 1111 1111 1111`
+     - **Failure:** `4000 0000 0000 0002`
+   - Test SuperChat feature in the live chat section
+
 4. **Run development server**
 ```bash
 npm start
@@ -37,8 +59,10 @@ Application will open at `http://localhost:3000`
 - `npm test` - Run tests
 
 ## Environment Variables
-- `REACT_APP_API_URL` - Backend API URL (default: http://localhost:6969/api)
-- `REACT_APP_WS_URL` - WebSocket URL (default: ws://localhost:1401)
+- `REACT_APP_API_URL` - Backend API URL (default: http://localhost:8000/api)
+- `REACT_APP_WEBSOCKET_URL` - WebSocket URL (default: ws://localhost:1401/ws/chat/live)
+- `REACT_APP_GOOGLE_CLIENT_ID` - Google OAuth Client ID
+- `REACT_APP_RAZORPAY_KEY_ID` - Razorpay public key for payments
 
 ## Project Structure
 
@@ -102,8 +126,9 @@ Create a `.env` file:
 
 ```env
 REACT_APP_GOOGLE_CLIENT_ID=your-google-client-id
-REACT_APP_API_BASE_URL=http://localhost:8000/api
+REACT_APP_API_URL=http://localhost:8000/api
 REACT_APP_WEBSOCKET_URL=ws://localhost:1401/ws/chat/live
+REACT_APP_RAZORPAY_KEY_ID=rzp_test_your_key_id_here
 ```
 
 ## Styling Features

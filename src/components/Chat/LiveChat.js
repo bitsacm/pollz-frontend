@@ -13,6 +13,7 @@ const LiveChat = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [showSuperChatModal, setShowSuperChatModal] = useState(false);
   const [superChats, setSuperChats] = useState([]);
+  const [selectedSuperChat, setSelectedSuperChat] = useState(null);
   const messagesEndRef = useRef(null);
   
   const { sendMessage, isConnected, connectionStatus, manualReconnect } = useWebSocket({
@@ -134,15 +135,29 @@ const LiveChat = () => {
       </div>
 
       {superChats.length > 0 && (
-        <div className="bg-gradient-to-r from-yellow-100 to-orange-100 p-2 border-b flex-shrink-0">
-          <div className="text-xs font-semibold text-gray-700 mb-1">Top SuperChats</div>
-          <div className="space-y-1 max-h-20 overflow-y-auto">
-            {superChats.slice(0, 2).map((sc, idx) => (
-              <div key={idx} className="flex items-center justify-between bg-white bg-opacity-70 rounded p-1">
-                <span className="text-xs font-medium truncate">{sc.message}</span>
-                <span className="text-xs font-bold text-orange-600">₹{sc.amount}</span>
-              </div>
-            ))}
+        <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white p-2 border-b flex-shrink-0 sticky top-0 z-10">
+          <div className="flex items-center mb-2">
+            <FiDollarSign className="text-white mr-1" />
+            <span className="text-xs font-bold">SuperChats</span>
+          </div>
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+            {superChats.map((sc, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => setSelectedSuperChat(sc)}
+                  className="bg-white bg-opacity-90 text-gray-800 rounded-lg p-2 min-w-[120px] max-w-[160px] flex-shrink-0 cursor-pointer hover:bg-opacity-100 transition-all duration-200 hover:scale-105"
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-bold text-orange-600">₹{sc.amount}</span>
+                    <span className="text-xs text-gray-600 truncate max-w-[60px]">
+                      {sc.user === '105864875153426983926' ? 'Anonymous' : (sc.user?.split('@')[0] || 'User')}
+                    </span>
+                  </div>
+                  <div className="text-xs font-medium text-gray-700 truncate">
+                    {sc.message || 'SuperChat'}
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
       )}
@@ -207,6 +222,63 @@ const LiveChat = () => {
           onClose={() => setShowSuperChatModal(false)}
           onSuccess={handleSuperChatSuccess}
         />
+      )}
+
+      {selectedSuperChat && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedSuperChat(null)}
+        >
+          <div 
+            className="bg-white rounded-lg shadow-xl max-w-md w-full p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold text-gray-800 flex items-center">
+                <FiDollarSign className="mr-2 text-orange-500" />
+                SuperChat Details
+              </h3>
+              <button
+                onClick={() => setSelectedSuperChat(null)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Amount:</span>
+                <span className="text-lg font-bold text-orange-600">₹{selectedSuperChat.amount}</span>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">From:</span>
+                <span className="text-sm font-medium text-gray-800">
+                  {selectedSuperChat.user === '105864875153426983926' 
+                    ? 'Anonymous' 
+                    : (selectedSuperChat.user?.split('@')[0] || 'User')}
+                </span>
+              </div>
+              
+              <div>
+                <span className="text-sm text-gray-600">Message:</span>
+                <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-800 whitespace-pre-wrap">
+                    {selectedSuperChat.message || 'No message'}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Time:</span>
+                <span className="text-sm text-gray-800">
+                  {new Date(selectedSuperChat.created_at).toLocaleString()}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
