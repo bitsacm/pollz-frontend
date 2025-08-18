@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-const WEBSOCKET_URL = process.env.REACT_APP_WS_URL || 'ws://localhost:1401';
+const WEBSOCKET_URL = process.env.REACT_APP_WEBSOCKET_URL || 'ws://localhost:1401';
 
 const useWebSocket = ({ onMessage, onConnect, onDisconnect }) => {
   const [isConnected, setIsConnected] = useState(false);
