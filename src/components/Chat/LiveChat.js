@@ -35,13 +35,12 @@ const LiveChat = () => {
 
   const fetchRecentMessages = async () => {
     try {
-      // Use WebSocket server API to get recent messages
-      const response = await fetch('http://localhost:1401/api/messages/search?limit=50');
-      const messages = await response.json();
-      setMessages(messages || []);
-      scrollToBottom();
+      // Recent messages will come through WebSocket connection, not HTTP API
+      // This function is called onConnect, but recent messages are sent automatically
+      // by the WebSocket server when client connects, so we don't need to fetch separately
+      console.log('WebSocket connected - waiting for recent messages...');
     } catch (error) {
-      console.error('Error fetching messages:', error);
+      console.error('Error in fetchRecentMessages:', error);
     }
   };
 

@@ -74,7 +74,24 @@ const useWebSocket = ({ onMessage, onConnect, onDisconnect }) => {
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          if (onMessageRef.current) onMessageRef.current(data);
+          
+          // Handle special "recent_messages" format from server
+          if (data.type === 'recent_messages' && data.message) {
+            try {
+              const recentData = JSON.parse(data.message);
+              if (recentData.messages && Array.isArray(recentData.messages)) {
+                // Send each message individually to match expected format
+                recentData.messages.forEach(msg => {
+                  if (onMessageRef.current) onMessageRef.current(msg);
+                });
+              }
+            } catch (parseError) {
+              console.error('Error parsing recent messages:', parseError);
+            }
+          } else {
+            // Handle normal individual messages
+            if (onMessageRef.current) onMessageRef.current(data);
+          }
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
         }
