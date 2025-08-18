@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FiUser, FiCheckCircle } from 'react-icons/fi';
 
-const CandidateCard = ({ candidate, onVote, hasVoted, totalVotes }) => {
+const CandidateCard = ({ candidate, onVote, hasVoted, totalVotes, disabled = false }) => {
   const votePercentage = totalVotes > 0 ? ((candidate.vote_count / totalVotes) * 100).toFixed(1) : 0;
 
   return (
@@ -57,9 +57,14 @@ const CandidateCard = ({ candidate, onVote, hasVoted, totalVotes }) => {
       ) : (
         <button
           onClick={() => onVote(candidate.id)}
-          className="w-full bg-theme-accent-yellow hover:bg-yellow-500 text-theme-black font-semibold py-1.5 px-3 rounded text-xs transition-colors"
+          disabled={disabled}
+          className={`w-full py-1.5 px-3 rounded text-xs transition-colors font-semibold ${
+            disabled 
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+              : 'bg-theme-accent-yellow hover:bg-yellow-500 text-theme-black'
+          }`}
         >
-          Vote
+          {disabled ? 'Voting Disabled' : 'Vote'}
         </button>
       )}
     </motion.div>

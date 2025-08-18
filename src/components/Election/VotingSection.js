@@ -3,9 +3,11 @@ import { toast } from 'react-toastify';
 import CandidateCard from './CandidateCard';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import useVotingStatus from '../../hooks/useVotingStatus';
 
 const VotingSection = () => {
   const { user, login } = useAuth();
+  const { isVotingAllowed, getStatusMessage, loading: statusLoading } = useVotingStatus();
   const [candidates, setCandidates] = useState({
     president: [],
     gensec: []
@@ -31,6 +33,11 @@ const VotingSection = () => {
   const handleVote = async (candidateId, position) => {
     if (!user) {
       toast.warning('Please login to vote');
+      return;
+    }
+
+    if (!isVotingAllowed()) {
+      toast.warning(getStatusMessage());
       return;
     }
 
@@ -88,6 +95,7 @@ const VotingSection = () => {
               onVote={(id) => handleVote(id, 'President')}
               hasVoted={user?.voted_president}
               totalVotes={getTotalVotes('president')}
+              disabled={!isVotingAllowed() || statusLoading}
             />
           ))}
           {candidates.president.length === 0 && (
@@ -115,6 +123,7 @@ const VotingSection = () => {
               onVote={(id) => handleVote(id, 'General Secretary')}
               hasVoted={user?.voted_gen_sec}
               totalVotes={getTotalVotes('gensec')}
+              disabled={!isVotingAllowed() || statusLoading}
             />
           ))}
           {candidates.gensec.length === 0 && (

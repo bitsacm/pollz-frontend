@@ -6,6 +6,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import VotingSection from '../components/Election/VotingSection';
 import LiveChat from '../components/Chat/LiveChat';
+import VotingStatus from '../components/VotingStatus';
 import api from '../services/api';
 
 const SUElection = () => {
@@ -55,23 +56,27 @@ const SUElection = () => {
           </div>
 
           {selectedYear === 2025 && (
-            <div className="bg-theme-pale-yellow border-l-4 border-theme-accent-yellow rounded-lg p-3 mb-4 flex items-center justify-between">
-              <div className="flex items-center">
-                <FiShield className="mr-2 text-theme-accent-yellow" />
-                <span className="text-sm font-medium text-theme-black">
-                  Your vote is secure, anonymous & encrypted
-                </span>
+            <>
+              <VotingStatus className="mb-4" />
+              
+              <div className="bg-theme-pale-yellow border-l-4 border-theme-accent-yellow rounded-lg p-3 mb-4 flex items-center justify-between">
+                <div className="flex items-center">
+                  <FiShield className="mr-2 text-theme-accent-yellow" />
+                  <span className="text-sm font-medium text-theme-black">
+                    Your vote is secure, anonymous & encrypted
+                  </span>
+                </div>
+                <a 
+                  href="https://github.com/your-repo/pollz" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-xs text-theme-black hover:text-theme-accent-yellow font-medium underline inline-flex items-center"
+                >
+                  <FiGithub className="mr-1" />
+                  View Source
+                </a>
               </div>
-              <a 
-                href="https://github.com/your-repo/pollz" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-xs text-theme-black hover:text-theme-accent-yellow font-medium underline inline-flex items-center"
-              >
-                <FiGithub className="mr-1" />
-                View Source
-              </a>
-            </div>
+            </>
           )}
         </div>
       </div>
