@@ -118,7 +118,7 @@ const Navbar = () => {
                     </button>
                   </div>
                 ) : (
-                  <div className="px-3">
+                  <div className="px-3 py-2">
                     <GoogleAuthButton />
                   </div>
                 )}
