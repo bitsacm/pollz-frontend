@@ -178,14 +178,21 @@ const LiveChat = () => {
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-theme-accent-yellow disabled:bg-gray-100 disabled:text-gray-500"
               maxLength={200}
             />
-            <button
-              type="button"
-              onClick={() => setShowSuperChatModal(true)}
-              className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-4 py-2 rounded-lg hover:from-yellow-500 hover:to-orange-500 transition-colors"
-              title="Send SuperChat"
+            <div 
+              className="relative group"
+              title="SuperChat feature coming soon - PR in progress"
             >
-              <FiDollarSign />
-            </button>
+              <button
+                type="button"
+                disabled={true}
+                className="bg-gray-400 text-gray-600 px-4 py-2 rounded-lg cursor-not-allowed opacity-50"
+              >
+                <FiDollarSign />
+              </button>
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                SuperChat coming soon - PR in progress
+              </div>
+            </div>
             <button
               type="submit"
               disabled={!isConnected || !inputMessage.trim()}
