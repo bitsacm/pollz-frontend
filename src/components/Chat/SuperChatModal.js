@@ -43,7 +43,7 @@ const SuperChatModal = ({ onClose, onSuccess }) => {
       });
       
       const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_lOF9X8ifjv64t2',
+        key: process.env.REACT_APP_RAZORPAY_KEY_ID,
         amount: orderResponse.data.amount,
         currency: orderResponse.data.currency,
         order_id: orderResponse.data.order_id,
