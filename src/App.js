@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import LandingPage from './pages/LandingPage';
 import SUElection from './pages/SUElection';
 import HuelVoting from './pages/HuelVoting';
@@ -14,15 +15,18 @@ function App() {
     <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || "your-google-client-id"}>
       <AuthProvider>
         <Router>
-          <div className="min-h-screen bg-gray-50">
+          <div className="min-h-screen bg-gray-50 flex flex-col">
             <Navbar />
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/elections" element={<SUElection />} />
-              <Route path="/huels" element={<HuelVoting />} />
-              <Route path="/departments" element={<DepartmentClubs />} />
-              <Route path="/contributors" element={<Contributors />} />
-            </Routes>
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/elections" element={<SUElection />} />
+                <Route path="/huels" element={<HuelVoting />} />
+                <Route path="/departments" element={<DepartmentClubs />} />
+                <Route path="/contributors" element={<Contributors />} />
+              </Routes>
+            </main>
+            <Footer />
           </div>
         </Router>
       </AuthProvider>
