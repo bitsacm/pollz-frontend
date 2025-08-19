@@ -64,7 +64,7 @@ const LandingPage = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-lg mt-4 text-center max-w-3xl text-theme-light-gray"
           >
-            Empowering democratic participation across campus elections, course feedback, and department activities
+            BITS ACM — Empowering Open Source Culture on Campus
           </motion.p>
 
           <motion.div
