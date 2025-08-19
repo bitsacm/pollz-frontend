@@ -252,7 +252,7 @@ const HuelVoting = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-theme-black mb-4">
-            Huel Voting System
+            Huel Voting
           </h1>
           <p className="text-xl text-theme-dark-gray">
             Rate and review courses to help fellow students make informed decisions
@@ -261,7 +261,7 @@ const HuelVoting = () => {
 
         {/* Search and Filter Controls */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <div className="grid md:grid-cols-4 gap-4">
+          <div className="grid md:grid-cols-3 gap-4">
             {/* Search */}
             <div className="relative">
               <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -301,16 +301,6 @@ const HuelVoting = () => {
                 <option value="grading">Sort by Grading</option>
                 <option value="toughness">Sort by Difficulty</option>
               </select>
-            </div>
-
-            {/* Results Count */}
-            <div className="flex items-center justify-center text-gray-600 text-sm">
-              {filteredHuels.length} courses found
-              {totalPages > 1 && (
-                <span className="ml-2 text-gray-500">
-                  (Page {currentPage}/{totalPages})
-                </span>
-              )}
             </div>
           </div>
         </div>

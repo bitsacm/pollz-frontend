@@ -30,7 +30,7 @@ const Footer = () => {
 
           {/* Project Repositories */}
           <div className="text-center md:text-left">
-            <h3 className="text-theme-accent-yellow font-bold text-lg mb-4">Contributing to Pollz</h3>
+            <h3 className="text-theme-accent-yellow font-bold text-lg mb-4">Contribute to Pollz | Open Source</h3>
             <div className="space-y-2">
               <a 
                 href="https://github.com/bitsacm/pollz-frontend" 
