@@ -23,6 +23,15 @@ const DepartmentClubs = () => {
     loadData();
   }, [activeTab, selectedSize, selectedCategory]);
 
+  // Reload data when user changes (login/logout)
+  useEffect(() => {
+    // Clear previous user's voting status
+    setUserVotes({});
+    if (!loading) {
+      loadData();
+    }
+  }, [user]);
+
   const loadData = async () => {
     try {
       setLoading(true);
@@ -37,7 +46,15 @@ const DepartmentClubs = () => {
       }
 
       const response = await departmentClubAPI.getItems(params);
-      setItems(response.data);
+      
+      // Sort items by vote count (descending) and assign proper ranks
+      const sortedItems = response.data.sort((a, b) => b.vote_count - a.vote_count);
+      const rankedItems = sortedItems.map((item, index) => ({
+        ...item,
+        rank: index + 1
+      }));
+      
+      setItems(rankedItems);
       
       // Extract unique categories for filter
       const uniqueCategories = [...new Set(response.data.map(item => item.category))];
@@ -68,9 +85,10 @@ const DepartmentClubs = () => {
     try {
       await departmentClubAPI.vote({ item_id: itemId });
       
-      // Update UI immediately
-      setItems(prevItems => 
-        prevItems.map(item => {
+      // Update UI immediately with proper ranking
+      setItems(prevItems => {
+        // First update the vote count
+        const updatedItems = prevItems.map(item => {
           if (item.id === itemId) {
             return {
               ...item,
@@ -79,8 +97,19 @@ const DepartmentClubs = () => {
             };
           }
           return item;
-        })
-      );
+        });
+        
+        // Sort by vote count (descending) to get proper ranking
+        const sortedItems = updatedItems.sort((a, b) => b.vote_count - a.vote_count);
+        
+        // Update ranks based on new sorting
+        const rankedItems = sortedItems.map((item, index) => ({
+          ...item,
+          rank: index + 1
+        }));
+        
+        return rankedItems;
+      });
       
       // Update user votes tracking
       setUserVotes(prev => ({ ...prev, [itemId]: true }));
