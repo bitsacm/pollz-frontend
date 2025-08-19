@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import axios from 'axios';
@@ -9,11 +10,10 @@ const BACKEND_URL = process.env.REACT_APP_API_URL;
 const GoogleAuthButton = () => {
   // Destructure the login function from your custom AuthContext
   const { login } = useAuth();
-  const buttonRef = useRef(null);
-  const initializationAttempts = useRef(0);
+  const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
 
-  const handleCredentialResponse = async (response) => {
-    const idToken = response.credential;
+  const handleCredentialResponse = async (credentialResponse) => {
+    const idToken = credentialResponse.credential;
     try {
       // Send the ID token to your backend for verification and authentication
       const backendResponse = await axios.post(`${BACKEND_URL}/main/auth/google-login/`, {
@@ -36,88 +36,69 @@ const GoogleAuthButton = () => {
     }
   };
 
+  const handleError = () => {
+    toast.error('Google login failed. Please try again.');
+  };
+
   useEffect(() => {
-    /**
-     * Loads the Google Identity Services script dynamically.
-     */
-    const loadGoogleScript = () => {
-      return new Promise((resolve, reject) => {
-        if (document.getElementById('google-jssdk')) {
-          resolve(true);
-          return;
-        }
-        const script = document.createElement('script');
-        script.id = 'google-jssdk';
-        script.src = 'https://accounts.google.com/gsi/client';
-        script.onload = () => resolve(true);
-        script.onerror = () => reject(new Error('Failed to load Google script'));
-        document.body.appendChild(script);
-      });
-    };
+    // Set a timer to show loading state briefly, then assume Google is ready
+    const timer = setTimeout(() => {
+      setIsGoogleLoaded(true);
+    }, 1000);
 
-    /**
-     * Renders the Google button
-     */
-    const renderGoogleButton = () => {
-      if (!buttonRef.current || !window.google?.accounts?.id) {
-        return false;
-      }
-
-      // Clear any existing button content
-      buttonRef.current.innerHTML = '';
-      
-      try {
-        window.google.accounts.id.renderButton(buttonRef.current, {
-          theme: 'outline',
-          size: 'large',
-          width: '100%',
-        });
-        return true;
-      } catch (error) {
-        console.error('Error rendering Google button:', error);
-        return false;
-      }
-    };
-
-    /**
-     * Initializes Google login
-     */
-    const initializeGoogleLogin = async () => {
-      try {
-        await loadGoogleScript();
-        
-        if (!window.google?.accounts?.id) {
-          console.error('Google Identity Services not available');
-          return;
-        }
-
-        window.google.accounts.id.initialize({
-          client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-          callback: handleCredentialResponse,
-        });
-
-        // Try to render the button
-        if (!renderGoogleButton()) {
-          // If rendering failed, try again after a short delay
-          setTimeout(() => {
-            if (initializationAttempts.current < 3) {
-              initializationAttempts.current++;
-              renderGoogleButton();
-            }
-          }, 500);
-        }
-      } catch (error) {
-        console.error('Error during Google login initialization:', error);
-      }
-    };
-
-    initializationAttempts.current = 0;
-    initializeGoogleLogin();
+    return () => clearTimeout(timer);
   }, []);
 
+  if (!isGoogleLoaded) {
+    return (
+      <span className="text-gray-500 px-3 py-2 text-sm font-medium">
+        Login
+      </span>
+    );
+  }
+
   return (
-    <div className="w-full">
-      <div ref={buttonRef} className="w-full min-h-[40px] flex items-center justify-center"></div>
+    <div className="google-login-wrapper">
+      <GoogleLogin
+        onSuccess={handleCredentialResponse}
+        onError={handleError}
+        useOneTap={false}
+      />
+      <style jsx global>{`
+        .google-login-wrapper [role="button"] {
+          all: unset !important;
+          background: none !important;
+          border: none !important;
+          box-shadow: none !important;
+          color: #e5e5e5 !important;
+          padding: 8px 12px !important;
+          font-size: 14px !important;
+          font-weight: 500 !important;
+          transition: color 200ms ease !important;
+          cursor: pointer !important;
+          font-family: inherit !important;
+          opacity: 1 !important;
+        }
+        .google-login-wrapper [role="button"]:hover {
+          color: #f5e74f !important;
+        }
+        .google-login-wrapper [role="button"] * {
+          display: none !important;
+        }
+        .google-login-wrapper [role="button"]::before {
+          content: "Login" !important;
+          display: inline !important;
+          font-size: 14px !important;
+          font-weight: 500 !important;
+          color: inherit !important;
+        }
+        .google-login-wrapper iframe {
+          display: none !important;
+        }
+        .google-login-wrapper div {
+          display: contents !important;
+        }
+      `}</style>
     </div>
   );
 };

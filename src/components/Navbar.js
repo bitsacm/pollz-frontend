@@ -48,26 +48,24 @@ const Navbar = () => {
               </Link>
             ))}
             
-            <div className="ml-4">
-              {user ? (
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={user.picture}
-                    alt={user.name}
-                    className="w-8 h-8 rounded-full"
-                  />
-                  <span className="text-theme-light-gray text-sm">{user.name}</span>
-                  <button
-                    onClick={logout}
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors"
-                  >
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <GoogleAuthButton />
-              )}
-            </div>
+            {user ? (
+              <div className="flex items-center space-x-4 ml-4">
+                <img
+                  src={user.picture}
+                  alt={user.name}
+                  className="w-8 h-8 rounded-full"
+                />
+                <span className="text-theme-light-gray text-sm">{user.name}</span>
+                <button
+                  onClick={logout}
+                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <GoogleAuthButton />
+            )}
           </div>
 
           {/* Mobile menu button */}
