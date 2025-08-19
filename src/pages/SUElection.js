@@ -33,7 +33,7 @@ const SUElection = () => {
   const totalVotes = electionStats?.total_votes_cast || 0;
 
   return (
-    <div className="h-screen bg-theme-light-gray flex flex-col">
+    <div className="min-h-screen bg-theme-light-gray flex flex-col pb-8">
       <ToastContainer position="top-right" autoClose={3000} />
       
       <div className="py-4 flex-shrink-0">
@@ -81,10 +81,10 @@ const SUElection = () => {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+      <div className="flex-1">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {selectedYear === 2025 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-full">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 min-h-[calc(100vh-12rem)]">
               <div className="lg:col-span-3">
                 <div className="bg-white rounded-xl shadow-lg h-full flex flex-col">
                   {!user && (
@@ -94,7 +94,7 @@ const SUElection = () => {
                       </p>
                     </div>
                   )}
-                  <div className="flex-1 overflow-y-auto p-4 pb-6">
+                  <div className="flex-1 overflow-y-auto p-4">
                     <VotingSection />
                   </div>
                 </div>

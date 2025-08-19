@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiChevronLeft, FiChevronRight, FiTrendingUp, FiUsers, FiAward } from 'react-icons/fi';
+import { FiChevronLeft, FiChevronRight, FiTrendingUp, FiUsers, FiAward, FiGithub } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import bitsImage from '../assets/bits-old-school.png';
 
@@ -82,6 +82,23 @@ const LandingPage = () => {
             <Link to="/departments" className="bg-theme-dark-gray hover:bg-gray-600 text-theme-pale-yellow font-bold py-3 px-8 rounded-lg transition-colors duration-200 shadow-lg">
               Club Voting
             </Link>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
+            className="mt-6 flex justify-center"
+          >
+            <a 
+              href="https://github.com/bitsacm" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="bg-transparent border-2 border-theme-accent-yellow hover:bg-theme-accent-yellow hover:text-theme-black text-theme-accent-yellow font-bold py-3 px-8 rounded-lg transition-colors duration-200 shadow-lg flex items-center gap-2"
+            >
+              <FiGithub className="text-xl" />
+              Contribute
+            </a>
           </motion.div>
         </div>
       </div>

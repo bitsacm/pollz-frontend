@@ -94,7 +94,7 @@ const LiveChat = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg flex flex-col" style={{ height: 'calc(100vh - 200px)' }}>
+    <div className="bg-white rounded-lg shadow-lg flex flex-col h-full">
       <div className="bg-theme-accent-yellow text-theme-black p-3 rounded-t-lg flex-shrink-0">
         <h2 className="text-lg font-bold flex items-center">
           <FiMessageCircle className="mr-2" />

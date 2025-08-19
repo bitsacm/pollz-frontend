@@ -27,7 +27,7 @@ const Navbar = () => {
             <Link to="/" className="flex items-center space-x-3">
               <div className="text-theme-accent-yellow font-bold text-2xl">POLLZ</div>
               <div className="hidden sm:block text-theme-light-gray text-xs">
-                PILANI UNIFIED VOTING SYSTEM
+                Open Source | BITS ACM
               </div>
             </Link>
           </div>
