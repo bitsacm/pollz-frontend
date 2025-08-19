@@ -315,6 +315,46 @@ const HuelVoting = () => {
           </div>
         </div>
 
+        {/* Pagination Controls */}
+        {!loading && filteredHuels.length > 0 && totalPages > 1 && (
+          <div className="flex items-center justify-center mb-6 px-4">
+            <div className="flex items-center space-x-6">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                  currentPage === 1
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md hover:shadow-lg'
+                }`}
+              >
+                <span>← Previous</span>
+              </button>
+              
+              <div className="flex flex-col items-center space-y-1">
+                <span className="text-gray-600 text-sm font-medium">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <span className="text-gray-500 text-xs">
+                  ({filteredHuels.length} courses total)
+                </span>
+              </div>
+              
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                  currentPage === totalPages
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md hover:shadow-lg'
+                }`}
+              >
+                <span>Next →</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Course Cards */}
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {currentHuels.map((huel) => (
@@ -323,9 +363,9 @@ const HuelVoting = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="bg-white rounded-xl shadow-lg overflow-hidden h-fit"
+              className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full"
             >
-              <div className="p-4">
+              <div className="p-4 flex flex-col h-full">
                 {/* Course Header */}
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-3">
                   <div className="flex-1">
@@ -436,7 +476,7 @@ const HuelVoting = () => {
                 </div>
 
                 {/* Comments Section */}
-                <div className="border-t pt-3">
+                <div className="border-t pt-3 mt-auto">
                   <button
                     onClick={() => setShowComments({
                       ...showComments,
@@ -498,44 +538,6 @@ const HuelVoting = () => {
           ))}
         </div>
 
-        {/* Pagination Controls */}
-        {!loading && filteredHuels.length > 0 && totalPages > 1 && (
-          <div className="flex items-center justify-between mt-8 px-4">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                currentPage === 1
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md hover:shadow-lg'
-              }`}
-            >
-              <span>← Previous</span>
-            </button>
-            
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-600 text-sm">
-                Page {currentPage} of {totalPages}
-              </span>
-              <span className="text-gray-500 text-sm">
-                ({filteredHuels.length} courses total)
-              </span>
-            </div>
-            
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                currentPage === totalPages
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md hover:shadow-lg'
-              }`}
-            >
-              <span>Next →</span>
-            </button>
-          </div>
-        )}
-
         {/* Loading State */}
         {loading && (
           <div className="text-center py-8">
@@ -550,16 +552,6 @@ const HuelVoting = () => {
             <p className="text-gray-500 text-lg">No courses found. Try adjusting your filters.</p>
           </div>
         )}
-
-        {/* Information */}
-        <div className="mt-8 text-center text-gray-500 text-sm">
-          <p>
-            All ratings and comments are anonymous to ensure honest feedback.
-          </p>
-          <p className="mt-2">
-            Help your fellow students by rating courses you've taken!
-          </p>
-        </div>
       </div>
       
       {/* Toast Notifications */}
