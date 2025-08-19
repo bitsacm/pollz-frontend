@@ -18,6 +18,8 @@ const HuelVoting = () => {
   const [loading, setLoading] = useState(true);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [selectedHuelForRating, setSelectedHuelForRating] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(6);
 
   // Load data on component mount
   useEffect(() => {
@@ -47,6 +49,11 @@ const HuelVoting = () => {
       loadData();
     }, 300);
     return () => clearTimeout(timeoutId);
+  }, [searchTerm, selectedDepartment, sortBy]);
+
+  // Reset to page 1 when search/filter changes
+  useEffect(() => {
+    setCurrentPage(1);
   }, [searchTerm, selectedDepartment, sortBy]);
 
   // Reload data when user changes (login/logout)
@@ -143,6 +150,12 @@ const HuelVoting = () => {
 
   // Data is already filtered from the backend
   const filteredHuels = huels;
+  
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredHuels.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentHuels = filteredHuels.slice(startIndex, endIndex);
 
   // Rating Modal Component
   const RatingModal = () => {
@@ -291,42 +304,47 @@ const HuelVoting = () => {
             </div>
 
             {/* Results Count */}
-            <div className="flex items-center justify-center text-gray-600">
+            <div className="flex items-center justify-center text-gray-600 text-sm">
               {filteredHuels.length} courses found
+              {totalPages > 1 && (
+                <span className="ml-2 text-gray-500">
+                  (Page {currentPage}/{totalPages})
+                </span>
+              )}
             </div>
           </div>
         </div>
 
         {/* Course Cards */}
-        <div className="space-y-6">
-          {filteredHuels.map((huel) => (
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {currentHuels.map((huel) => (
             <motion.div
               key={huel.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="bg-white rounded-xl shadow-lg overflow-hidden"
+              className="bg-white rounded-xl shadow-lg overflow-hidden h-fit"
             >
-              <div className="p-6">
+              <div className="p-4">
                 {/* Course Header */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                  <div>
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-3">
+                  <div className="flex-1">
                     {loading && (
                       <div className="animate-pulse">
                         <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                         <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                       </div>
                     )}
-                    <h3 className="text-xl font-bold text-theme-black">
+                    <h3 className="text-lg font-bold text-theme-black mb-1">
                       {huel.code} - {huel.name}
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-sm text-gray-600">
                       {huel.department_name} • {huel.instructor}
                     </p>
                   </div>
                   
                   {/* Rate Button */}
-                  <div className="flex items-center mt-4 md:mt-0">
+                  <div className="flex items-center mt-2 md:mt-0 md:ml-4">
                     <button
                       onClick={() => {
                         if (!user) {
@@ -336,33 +354,33 @@ const HuelVoting = () => {
                         setSelectedHuelForRating(huel);
                         setShowRatingModal(true);
                       }}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                      className={`flex items-center space-x-1 px-3 py-1.5 text-sm rounded-lg transition-colors ${
                         huel.user_rating
                           ? 'bg-blue-500 text-white'
                           : 'bg-blue-100 hover:bg-blue-200 text-blue-700'
                       }`}
                     >
-                      <FiStar />
-                      <span>{huel.user_rating ? 'Edit Rating' : 'Rate Course'}</span>
+                      <FiStar className="w-4 h-4" />
+                      <span className="hidden sm:inline">{huel.user_rating ? 'Edit' : 'Rate'}</span>
                     </button>
                   </div>
                 </div>
 
                 {/* Ratings */}
-                <div className="grid md:grid-cols-3 gap-6 mb-6">
+                <div className="grid grid-cols-3 gap-4 mb-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold mb-1">
+                    <div className="text-lg font-bold mb-0.5">
                       <span className={getRatingColor(huel.avg_grading)}>
                         {huel.avg_grading.toFixed(1)}
                       </span>
-                      <span className="text-gray-400">/5</span>
+                      <span className="text-gray-400 text-sm">/5</span>
                     </div>
-                    <div className="text-sm text-gray-600">Grading</div>
-                    <div className="flex justify-center mt-1">
+                    <div className="text-xs text-gray-600 mb-1">Grading</div>
+                    <div className="flex justify-center">
                       {[...Array(5)].map((_, i) => (
                         <FiStar
                           key={i}
-                          className={`w-4 h-4 ${
+                          className={`w-3 h-3 ${
                             i < Math.floor(huel.avg_grading)
                               ? 'text-yellow-400 fill-current'
                               : 'text-gray-300'
@@ -373,18 +391,18 @@ const HuelVoting = () => {
                   </div>
 
                   <div className="text-center">
-                    <div className="text-2xl font-bold mb-1">
+                    <div className="text-lg font-bold mb-0.5">
                       <span className={getDifficultyColor(huel.avg_toughness)}>
                         {huel.avg_toughness.toFixed(1)}
                       </span>
-                      <span className="text-gray-400">/5</span>
+                      <span className="text-gray-400 text-sm">/5</span>
                     </div>
-                    <div className="text-sm text-gray-600">Difficulty</div>
-                    <div className="flex justify-center mt-1">
+                    <div className="text-xs text-gray-600 mb-1">Difficulty</div>
+                    <div className="flex justify-center">
                       {[...Array(5)].map((_, i) => (
                         <FiStar
                           key={i}
-                          className={`w-4 h-4 ${
+                          className={`w-3 h-3 ${
                             i < Math.floor(huel.avg_toughness)
                               ? 'text-red-400 fill-current'
                               : 'text-gray-300'
@@ -395,18 +413,18 @@ const HuelVoting = () => {
                   </div>
 
                   <div className="text-center">
-                    <div className="text-2xl font-bold mb-1">
+                    <div className="text-lg font-bold mb-0.5">
                       <span className={getRatingColor(huel.avg_overall)}>
                         {huel.avg_overall.toFixed(1)}
                       </span>
-                      <span className="text-gray-400">/5</span>
+                      <span className="text-gray-400 text-sm">/5</span>
                     </div>
-                    <div className="text-sm text-gray-600">Overall</div>
-                    <div className="flex justify-center mt-1">
+                    <div className="text-xs text-gray-600 mb-1">Overall</div>
+                    <div className="flex justify-center">
                       {[...Array(5)].map((_, i) => (
                         <FiStar
                           key={i}
-                          className={`w-4 h-4 ${
+                          className={`w-3 h-3 ${
                             i < Math.floor(huel.avg_overall)
                               ? 'text-theme-accent-yellow fill-current'
                               : 'text-gray-300'
@@ -418,36 +436,36 @@ const HuelVoting = () => {
                 </div>
 
                 {/* Comments Section */}
-                <div className="border-t pt-4">
+                <div className="border-t pt-3">
                   <button
                     onClick={() => setShowComments({
                       ...showComments,
                       [huel.id]: !showComments[huel.id]
                     })}
-                    className="flex items-center space-x-2 text-theme-black hover:text-theme-dark-gray font-medium mb-4"
+                    className="flex items-center space-x-2 text-theme-black hover:text-theme-dark-gray font-medium mb-3 text-sm"
                   >
-                    <FiMessageCircle />
+                    <FiMessageCircle className="w-4 h-4" />
                     <span>
                       {showComments[huel.id] ? 'Hide' : 'Show'} Comments ({huel.comments.length})
                     </span>
                   </button>
 
                   {showComments[huel.id] && (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {/* Existing Comments */}
                       {huel.comments.map((comment) => (
-                        <div key={comment.id} className="bg-gray-50 rounded-lg p-4">
-                          <div className="flex justify-between items-start mb-2">
-                            <span className="font-medium text-gray-800">{comment.user_name}</span>
-                            <span className="text-sm text-gray-500">{comment.time_ago}</span>
+                        <div key={comment.id} className="bg-gray-50 rounded-lg p-3">
+                          <div className="flex justify-between items-start mb-1">
+                            <span className="font-medium text-gray-800 text-sm">{comment.user_name}</span>
+                            <span className="text-xs text-gray-500">{comment.time_ago}</span>
                           </div>
-                          <p className="text-gray-700">{comment.text}</p>
+                          <p className="text-gray-700 text-sm">{comment.text}</p>
                         </div>
                       ))}
 
                       {/* Add Comment */}
                       {user && (
-                        <div className="flex space-x-3">
+                        <div className="flex space-x-2">
                           <input
                             type="text"
                             placeholder="Add a comment..."
@@ -456,11 +474,11 @@ const HuelVoting = () => {
                               ...newComment,
                               [huel.id]: e.target.value
                             })}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-theme-accent-yellow focus:border-transparent"
+                            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-theme-accent-yellow focus:border-transparent"
                           />
                           <button
                             onClick={() => handleComment(huel.id)}
-                            className="bg-theme-accent-yellow hover:bg-theme-warm-yellow text-theme-black px-6 py-2 rounded-lg transition-colors"
+                            className="bg-theme-accent-yellow hover:bg-theme-warm-yellow text-theme-black px-4 py-2 text-sm rounded-lg transition-colors"
                           >
                             Post
                           </button>
@@ -479,6 +497,44 @@ const HuelVoting = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* Pagination Controls */}
+        {!loading && filteredHuels.length > 0 && totalPages > 1 && (
+          <div className="flex items-center justify-between mt-8 px-4">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                currentPage === 1
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md hover:shadow-lg'
+              }`}
+            >
+              <span>← Previous</span>
+            </button>
+            
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-600 text-sm">
+                Page {currentPage} of {totalPages}
+              </span>
+              <span className="text-gray-500 text-sm">
+                ({filteredHuels.length} courses total)
+              </span>
+            </div>
+            
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                currentPage === totalPages
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md hover:shadow-lg'
+              }`}
+            >
+              <span>Next →</span>
+            </button>
+          </div>
+        )}
 
         {/* Loading State */}
         {loading && (
