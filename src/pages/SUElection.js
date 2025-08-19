@@ -67,7 +67,7 @@ const SUElection = () => {
                   </span>
                 </div>
                 <a 
-                  href="https://github.com/your-repo/pollz" 
+                  href="https://github.com/bitsacm/pollz-backend/blob/main/main/views.py" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-xs text-theme-black hover:text-theme-accent-yellow font-medium underline inline-flex items-center"
