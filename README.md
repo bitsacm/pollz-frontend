@@ -5,26 +5,90 @@ A modern React application for the BITS Pilani unified voting platform featuring
 ## Prerequisites
 - Node.js 16+
 - npm or yarn
+- Linux or macOS (preferred). On Windows, use **WSL** or dual boot.
 
-## Setup
+---
 
-1. **Clone and navigate to frontend**
-```bash
-cd pollz-frontend/
-```
+## Setup Instructions
 
-2. **Install dependencies**
+### Option 1: Clone All Repositories (recommended for full-stack setup)
+
+1. **Fork** the repositories on GitHub (backend, frontend, websocket) from the original organization:  
+
+   * Backend: [bitsacm/pollz-backend](https://github.com/bitsacm/pollz-backend)  
+   * Frontend: [bitsacm/pollz-frontend](https://github.com/bitsacm/pollz-frontend)  
+   * Websocket: [bitsacm/pollz-websocket](https://github.com/bitsacm/pollz-websocket)  
+
+2. **Clone your forks** into a single `pollz` folder (replace `<your-github-username>` with yours):
+
+   ```bash
+   # Create a parent folder to keep all Pollz repos together
+   mkdir pollz
+   cd pollz
+
+   # Clone backend
+   git clone https://github.com/<your-github-username>/pollz-backend.git
+
+   # Clone frontend
+   git clone https://github.com/<your-github-username>/pollz-frontend.git
+
+   # Clone websocket
+   git clone https://github.com/<your-github-username>/pollz-websocket.git
+
+3. **Add upstream remotes** to fetch updates from the official repos:
+
+   ```bash
+   cd pollz-backend
+   git remote add upstream https://github.com/bitsacm/pollz-backend.git
+   cd ..
+
+   cd pollz-frontend
+   git remote add upstream https://github.com/bitsacm/pollz-frontend.git
+   cd ..
+
+   cd pollz-websocket
+   git remote add upstream https://github.com/bitsacm/pollz-websocket.git
+   cd ..
+   ```
+
+---
+
+### Option 2: Clone Frontend Only
+
+1. **Fork** the repository on GitHub.
+
+2. **Clone your fork** (replace `<your-github-username>`):
+
+   ```bash
+   git clone https://github.com/<your-github-username>/pollz-frontend.git
+   cd pollz-frontend
+   ```
+
+3. *(Optional but recommended for contributors)* Add the original repo as upstream:
+
+   ```bash
+   git remote add upstream https://github.com/bitsacm/pollz-frontend.git
+   git fetch upstream
+   ```
+---
+
+### Running the Frontend Locally
+
+> **Note:** Make sure you are inside the `pollz-frontend/` directory before running the following commands.
+
+
+1. **Install dependencies**
 ```bash
 npm install
 ```
 
-3. **Setup environment variables**
+2. **Setup environment variables**
 ```bash
 cp .env.example .env
 # Edit .env with your API endpoints
 ```
 
-4. **Run development server**
+3. **Run development server**
 ```bash
 npm start
 ```
@@ -35,10 +99,6 @@ Application will open at `http://localhost:3000`
 - `npm start` - Run development server
 - `npm run build` - Build for production
 - `npm test` - Run tests
-
-## Environment Variables
-- `REACT_APP_API_URL` - Backend API URL (default: http://localhost:6969/api)
-- `REACT_APP_WS_URL` - WebSocket URL (default: ws://localhost:1401)
 
 ## Project Structure
 
@@ -102,8 +162,8 @@ Create a `.env` file:
 
 ```env
 REACT_APP_GOOGLE_CLIENT_ID=your-google-client-id
-REACT_APP_API_BASE_URL=http://localhost:8000/api
-REACT_APP_WEBSOCKET_URL=ws://localhost:1401/ws/chat/live
+REACT_APP_API_URL=http://localhost:6969/api
+REACT_APP_WEBSOCKET_URL=ws://localhost:1401
 ```
 
 ## Styling Features
