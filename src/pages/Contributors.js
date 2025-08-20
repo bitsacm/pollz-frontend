@@ -309,26 +309,26 @@ const Contributors = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-6 lg:py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         
         {/* Project Info Section */}
         {projectInfo && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-lg shadow-lg p-8 mb-8"
+            className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6 lg:mb-8"
           >
             {/* Repository Links at the top */}
-            <div className="mb-8">
-              <div className="flex flex-wrap gap-4 justify-center">
+            <div className="mb-4 sm:mb-6 lg:mb-8">
+              <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-4 justify-center">
                 {projectInfo.repositories.map((repo, index) => (
                   <a 
                     key={index}
                     href={repo.github_url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 hover:border-gray-400 hover:shadow-sm transition-all duration-200 group"
+                    className="inline-flex items-center px-3 sm:px-4 py-2 rounded-lg border border-gray-300 hover:border-gray-400 hover:shadow-sm transition-all duration-200 group text-sm"
                   >
                     <div className={`w-3 h-3 rounded-full mr-3 ${
                       repo.type === 'backend' ? 'bg-green-500' :
@@ -346,17 +346,17 @@ const Contributors = () => {
             </div>
             
             {/* Two Column Layout: Story + Top 10 Contributors */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8 mb-8">
               
-              {/* Left Column: Project Creators Story - Takes 2/3 */}
-              <div className="lg:col-span-2">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">The Story Behind POLLZ X BITS ACM</h2>
+              {/* Left Column: Project Creators Story - Takes 2/3 on xl screens, full width on smaller */}
+              <div className="xl:col-span-2">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">The Story Behind POLLZ X BITS ACM</h2>
                 
                 <div className="rounded-lg overflow-hidden shadow-lg relative">
                   {projectInfo.project_creators?.map((creator, index) => (
                     <div key={index}>
                       {/* Background Image with Text Overlay */}
-                      <div className="relative min-h-[400px]">
+                      <div className="relative min-h-[300px] sm:min-h-[350px] lg:min-h-[400px]">
                         {/* Background Image */}
                         <img 
                           src={pollzCreatorsImage} 
@@ -368,10 +368,10 @@ const Contributors = () => {
                         <div className="absolute inset-0 bg-black bg-opacity-65 rounded-lg"></div>
                         
                         {/* Text Content Overlay */}
-                        <div className="relative z-10 p-8 h-full flex flex-col justify-center">
-                          <div className="rounded-lg p-6 backdrop-blur-[0.5px]">
+                        <div className="relative z-10 p-4 sm:p-6 lg:p-8 h-full flex flex-col justify-center">
+                          <div className="rounded-lg p-3 sm:p-4 lg:p-6 backdrop-blur-[0.5px]">
                             {creator.story && creator.story.split('\n\n').map((paragraph, idx) => (
-                              <p key={idx} className="text-white mb-2 leading-relaxed text-justify text-base font-medium drop-shadow-lg">
+                              <p key={idx} className="text-white mb-2 leading-relaxed text-justify text-sm sm:text-base font-medium drop-shadow-lg">
                                 {paragraph}
                               </p>
                             ))}
@@ -382,9 +382,9 @@ const Contributors = () => {
                   ))}
                 </div>
               </div>
-              {/* Right Column: Top 10 Contributors - Takes 1/3 */}
-              <div className="lg:col-span-1">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">🏆 Top 10 Contributors</h2>
+              {/* Right Column: Top 10 Contributors - Takes 1/3 on xl screens, full width on smaller */}
+              <div className="xl:col-span-1 order-first xl:order-last">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">🏆 Top 10 Contributors</h2>
                 
                 <div className="space-y-3">
                   {allContributors.length > 0 ? 
@@ -398,20 +398,20 @@ const Contributors = () => {
                           initial={{ opacity: 0, x: 20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.1 }}
-                          className={`border rounded-lg p-3 hover:shadow-md transition-shadow ${
+                          className={`border rounded-lg p-2.5 sm:p-3 hover:shadow-md transition-shadow ${
                             isCreator 
                               ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-300' 
                               : 'bg-white border-gray-200'
                           }`}
                         >
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-2 sm:space-x-3">
                             {/* Rank Badge or Crown */}
                             {isCreator ? (
-                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-yellow-500 text-yellow-900 text-xs">
+                              <div className="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-yellow-500 text-yellow-900 text-xs">
                                 👑
                               </div>
                             ) : (
-                              <div className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${getRankBadgeColor(contributor.rank)}`}>
+                              <div className={`flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full text-xs font-bold ${getRankBadgeColor(contributor.rank)}`}>
                                 {contributor.rank}
                               </div>
                             )}
@@ -420,7 +420,7 @@ const Contributors = () => {
                             <img
                               src={contributor.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(contributor.name)}&background=f59e0b&color=1f2937`}
                               alt={contributor.name}
-                              className={`w-8 h-8 rounded-full bg-gray-200 ${
+                              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-200 flex-shrink-0 ${
                                 isCreator ? 'border-2 border-yellow-400' : ''
                               }`}
                               onError={(e) => {
@@ -430,19 +430,19 @@ const Contributors = () => {
                             
                             {/* Contributor Info */}
                             <div className="flex-grow min-w-0">
-                              <div className="flex items-center space-x-1">
-                                <h3 className="font-semibold text-sm text-gray-900 truncate">{contributor.name}</h3>
+                              <div className="flex flex-col space-y-0.5">
+                                <h3 className="font-semibold text-xs sm:text-sm text-gray-900 truncate leading-tight">{contributor.name}</h3>
                                 {isCreator && (
-                                  <span className="text-xs font-medium text-yellow-700 bg-yellow-200 px-1 rounded">
-                                    (Project Creator)
+                                  <span className="text-xs font-medium text-yellow-700 bg-yellow-200 px-1 rounded self-start">
+                                    Creator
                                   </span>
                                 )}
+                                <p className="text-xs text-gray-500 truncate">@{contributor.username}</p>
                               </div>
-                              <p className="text-xs text-gray-500 truncate">@{contributor.username}</p>
                             </div>
 
                             {/* Compact Stats */}
-                            <div className="flex flex-col items-end">
+                            <div className="flex flex-col items-end flex-shrink-0">
                               {loadingStats.commits.has(contributor.username) ? (
                                 <div className="text-xs text-gray-400 animate-pulse">Loading...</div>
                               ) : (
@@ -468,20 +468,20 @@ const Contributors = () => {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.1 }}
-                            className={`border rounded-lg p-3 hover:shadow-md transition-shadow ${
+                            className={`border rounded-lg p-2.5 sm:p-3 hover:shadow-md transition-shadow ${
                               isCreator 
                                 ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-300' 
                                 : 'bg-white border-gray-200'
                             }`}
                           >
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-2 sm:space-x-3">
                               {/* Rank Badge or Crown */}
                               {isCreator ? (
-                                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-yellow-500 text-yellow-900 text-xs">
+                                <div className="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-yellow-500 text-yellow-900 text-xs">
                                   👑
                                 </div>
                               ) : (
-                                <div className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${getRankBadgeColor(contributor.rank)}`}>
+                                <div className={`flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full text-xs font-bold ${getRankBadgeColor(contributor.rank)}`}>
                                   {contributor.rank}
                                 </div>
                               )}
@@ -490,7 +490,7 @@ const Contributors = () => {
                               <img
                                 src={contributor.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(contributor.name)}&background=f59e0b&color=1f2937`}
                                 alt={contributor.name}
-                                className={`w-8 h-8 rounded-full bg-gray-200 ${
+                                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-200 flex-shrink-0 ${
                                   isCreator ? 'border-2 border-yellow-400' : ''
                                 }`}
                                 onError={(e) => {
@@ -500,19 +500,19 @@ const Contributors = () => {
                               
                               {/* Contributor Info */}
                               <div className="flex-grow min-w-0">
-                                <div className="flex items-center space-x-1">
-                                  <h3 className="font-semibold text-sm text-gray-900 truncate">{contributor.name}</h3>
+                                <div className="flex flex-col space-y-0.5">
+                                  <h3 className="font-semibold text-xs sm:text-sm text-gray-900 truncate leading-tight">{contributor.name}</h3>
                                   {isCreator && (
-                                    <span className="text-xs font-medium text-yellow-700 bg-yellow-200 px-1 rounded">
-                                      (Project Creator)
+                                    <span className="text-xs font-medium text-yellow-700 bg-yellow-200 px-1 rounded self-start">
+                                      Creator
                                     </span>
                                   )}
+                                  <p className="text-xs text-gray-500 truncate">@{contributor.username}</p>
                                 </div>
-                                <p className="text-xs text-gray-500 truncate">@{contributor.username}</p>
                               </div>
 
                               {/* Compact Stats */}
-                              <div className="flex flex-col items-end">
+                              <div className="flex flex-col items-end flex-shrink-0">
                                 {loadingStats.commits.has(contributor.username) ? (
                                   <div className="text-xs text-gray-400 animate-pulse">Loading...</div>
                                 ) : (
@@ -556,18 +556,18 @@ const Contributors = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white rounded-lg shadow-lg p-8"
+          className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8"
         >
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
+            <div className="flex-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                 All Contributors
               </h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
                 (Ranked by: Lines×0.1 + Commits×1 + Creator Bonus)
               </p>
               {(loadingStats.commits.size > 0 || loadingStats.lines.size > 0) && (
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-xs sm:text-sm text-gray-500 mt-2">
                   Loading stats... 
                   {loadingStats.commits.size > 0 && ' commits'}
                   {loadingStats.lines.size > 0 && ' lines'}
@@ -577,16 +577,18 @@ const Contributors = () => {
             </div>
             
             {/* Repository Filter */}
-            <select
-              value={selectedRepo}
-              onChange={(e) => setSelectedRepo(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-theme-accent-yellow focus:border-transparent"
-            >
-              <option value="all">All Repositories</option>
-              <option value="backend">Backend</option>
-              <option value="frontend">Frontend</option>
-              <option value="websocket">WebSocket</option>
-            </select>
+            <div className="flex-shrink-0">
+              <select
+                value={selectedRepo}
+                onChange={(e) => setSelectedRepo(e.target.value)}
+                className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-theme-accent-yellow focus:border-transparent"
+              >
+                <option value="all">All Repositories</option>
+                <option value="backend">Backend</option>
+                <option value="frontend">Frontend</option>
+                <option value="websocket">WebSocket</option>
+              </select>
+            </div>
           </div>
 
           {allContributors.length === 0 ? (
@@ -603,21 +605,21 @@ const Contributors = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className={`border rounded-lg p-6 hover:shadow-md transition-shadow ${
+                    className={`border rounded-lg p-3 sm:p-4 lg:p-6 hover:shadow-md transition-shadow ${
                       isCreator 
                         ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-300' 
                         : 'border-gray-200'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      <div className="flex items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
                         {/* Rank Badge or Crown */}
                         {isCreator ? (
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-500 text-yellow-900 text-sm">
+                          <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-yellow-500 text-yellow-900 text-sm flex-shrink-0">
                             👑
                           </div>
                         ) : (
-                          <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold ${getRankBadgeColor(contributor.rank)}`}>
+                          <div className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-sm font-bold flex-shrink-0 ${getRankBadgeColor(contributor.rank)}`}>
                             {contributor.rank}
                           </div>
                         )}
@@ -626,7 +628,7 @@ const Contributors = () => {
                         <img
                           src={contributor.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(contributor.name)}&background=f59e0b&color=1f2937`}
                           alt={contributor.name}
-                          className={`w-12 h-12 rounded-full bg-gray-200 ${
+                          className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-200 flex-shrink-0 ${
                             isCreator ? 'border-2 border-yellow-400' : ''
                           }`}
                           onError={(e) => {
@@ -635,22 +637,22 @@ const Contributors = () => {
                         />
                         
                         {/* Contributor Info */}
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <h3 className="font-semibold text-lg text-gray-900">{contributor.name}</h3>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 gap-1 sm:gap-0">
+                            <h3 className="font-semibold text-base sm:text-lg text-gray-900 truncate">{contributor.name}</h3>
                             {isCreator && (
-                              <span className="text-sm font-medium text-yellow-700 bg-yellow-200 px-2 py-1 rounded">
-                                (Project Creator)
+                              <span className="text-xs sm:text-sm font-medium text-yellow-700 bg-yellow-200 px-2 py-0.5 sm:py-1 rounded self-start">
+                                Creator
                               </span>
                             )}
                           </div>
-                          <p className="text-sm text-gray-500">@{contributor.username}</p>
+                          <p className="text-sm text-gray-500 truncate">@{contributor.username}</p>
                           {contributor.github_url && (
                             <a 
                               href={contributor.github_url} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="text-xs text-blue-600 hover:text-blue-800"
+                              className="text-xs text-blue-600 hover:text-blue-800 block sm:inline"
                             >
                               View GitHub Profile
                             </a>
@@ -659,8 +661,8 @@ const Contributors = () => {
                       </div>
 
                       {/* Contribution Stats */}
-                      <div className="flex items-center space-x-4">
-                        <div className="flex space-x-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                        <div className="flex justify-between sm:justify-start sm:space-x-4 lg:space-x-6">
                           <StatDisplay 
                             value={repoContribs.commits}
                             label="Commits"
@@ -671,13 +673,13 @@ const Contributors = () => {
                             value={repoContribs.additions ? `+${repoContribs.additions.toLocaleString()}` : '+0'}
                             label="Lines Added"
                             isLoading={loadingStats.lines.has(contributor.username)}
-                            className="text-green-600 text-xl"
+                            className="text-green-600 text-lg sm:text-xl"
                           />
                           <StatDisplay 
                             value={repoContribs.deletions ? `-${repoContribs.deletions.toLocaleString()}` : '-0'}
                             label="Lines Deleted"
                             isLoading={loadingStats.lines.has(contributor.username)}
-                            className="text-red-600 text-xl"
+                            className="text-red-600 text-lg sm:text-xl"
                           />
                         </div>
                         
@@ -685,7 +687,7 @@ const Contributors = () => {
                         {selectedRepo === 'all' && (
                           <button
                             onClick={() => toggleContributorExpansion(contributor.username)}
-                            className="ml-4 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors flex items-center space-x-1"
+                            className="self-center sm:ml-4 px-3 py-1.5 text-xs sm:text-sm bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors flex items-center justify-center space-x-1"
                             disabled={loadingStats.commits.has(contributor.username) || 
                                      loadingStats.lines.has(contributor.username)}
                           >
@@ -697,7 +699,7 @@ const Contributors = () => {
                             {!(loadingStats.commits.has(contributor.username) || 
                                loadingStats.lines.has(contributor.username)) && (
                               <svg 
-                                className={`w-4 h-4 transition-transform ${expandedContributors.has(contributor.username) ? 'rotate-180' : ''}`} 
+                                className={`w-3 h-3 sm:w-4 sm:h-4 transition-transform ${expandedContributors.has(contributor.username) ? 'rotate-180' : ''}`} 
                                 fill="currentColor" 
                                 viewBox="0 0 20 20"
                               >
@@ -711,11 +713,11 @@ const Contributors = () => {
 
                     {/* Repository Breakdown (when showing all and expanded) */}
                     {selectedRepo === 'all' && expandedContributors.has(contributor.username) && (
-                      <div className={`mt-4 pt-4 border-t border-gray-100 ${
-                        isCreator ? 'bg-yellow-100 -mx-6 -mb-6 px-6 pb-6 rounded-b-lg' : ''
+                      <div className={`mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100 ${
+                        isCreator ? 'bg-yellow-100 -mx-3 sm:-mx-4 lg:-mx-6 -mb-3 sm:-mb-4 lg:-mb-6 px-3 sm:px-4 lg:px-6 pb-3 sm:pb-4 lg:pb-6 rounded-b-lg' : ''
                       }`}>
-                        <p className="text-sm text-gray-600 mb-2">Contributions by repository:</p>
-                        <div className="grid grid-cols-3 gap-4 text-sm">
+                        <p className="text-sm text-gray-600 mb-3">Contributions by repository:</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-sm">
                           <div className="text-center p-3 bg-green-50 rounded">
                             <div className="font-semibold text-green-600 mb-1">Backend</div>
                             <div className="text-xs space-y-1">
@@ -744,8 +746,11 @@ const Contributors = () => {
                         
                         {isCreator && (
                           <div className="mt-4 p-3 bg-yellow-200 rounded-lg">
-                            <p className="text-sm font-semibold text-yellow-800 flex items-center">
-                              👑 <span className="ml-2">Project Creator - Created: {contributor.created_repos?.join(', ')} repositories</span>
+                            <p className="text-xs sm:text-sm font-semibold text-yellow-800 flex flex-col sm:flex-row sm:items-center">
+                              <span className="flex items-center">
+                                👑 <span className="ml-2">Project Creator</span>
+                              </span>
+                              <span className="sm:ml-2 mt-1 sm:mt-0">- Created: {contributor.created_repos?.join(', ')} repositories</span>
                             </p>
                           </div>
                         )}
