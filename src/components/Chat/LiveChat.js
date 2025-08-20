@@ -147,7 +147,44 @@ const LiveChat = () => {
       )}
 
       <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0">
-        {messages.length === 0 ? (
+        {/* Chat temporarily disabled - show callout message */}
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <FiMessageCircle className="h-5 w-5 text-yellow-400" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-yellow-800">Chat is temporarily disabled</h3>
+              <div className="mt-2 text-sm text-yellow-700">
+                <p className="mb-2">
+                  <strong>Discussion:</strong> Need to decide on chat functionality. 
+                  Should users chat anonymously or display their names/emails to prevent spam?
+                </p>
+                <p>
+                  Provide your input here: 
+                  <a href="https://github.com/bitsacm/pollz-frontend/issues/26" 
+                     className="text-yellow-800 underline hover:text-yellow-900" 
+                     target="_blank" 
+                     rel="noopener noreferrer">
+                    Frontend Issue #26
+                  </a>
+                </p>
+                <p></p>
+                <p className="my-2">Also We're working on this issue: 
+                  <a href="https://github.com/bitsacm/pollz-websocket/issues/3" 
+                     className="text-yellow-800 underline hover:text-yellow-900" 
+                     target="_blank" 
+                     rel="noopener noreferrer">
+                    WebSocket Issue #3
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Uncomment this section when re-enabling chat */}
+        {/* {messages.length === 0 ? (
           <div className="text-center text-gray-500 py-8">
             <FiMessageCircle className="text-3xl mx-auto mb-2 text-gray-300" />
             <p className="text-sm">No messages yet. Be the first to chat!</p>
@@ -156,15 +193,12 @@ const LiveChat = () => {
           messages.map((msg, index) => (
             <ChatMessage key={index} message={msg} />
           ))
-        )}
+        )} */}
         <div ref={messagesEndRef} />
       </div>
 
       <div className="border-t p-3 flex-shrink-0">
-        {/* Live chat messaging temporarily disabled */}
-        <div className="text-center text-gray-500 py-2 bg-gray-50 rounded-lg">
-          Live chat messaging is temporarily disabled
-        </div>
+        {/* Uncomment this section when re-enabling chat */}
         {/* {user ? (
           <form onSubmit={handleSendMessage} className="flex space-x-2">
             <input
