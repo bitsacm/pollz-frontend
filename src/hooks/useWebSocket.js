@@ -107,16 +107,16 @@ const useWebSocket = ({ onMessage, onConnect, onDisconnect }) => {
         setConnectionStatus('disconnected');
         if (onDisconnectRef.current) onDisconnectRef.current();
         
-        // Only auto-reconnect if it wasn't a manual close (code 1000)
-        if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts) {
-          reconnectAttemptsRef.current++;
-          const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000); // Exponential backoff, max 30s
-          
-          
-          reconnectTimeoutRef.current = setTimeout(() => {
-            connectWebSocket();
-          }, delay);
-        }
+        // Auto-reconnect temporarily disabled
+        // if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts) {
+        //   reconnectAttemptsRef.current++;
+        //   const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000); // Exponential backoff, max 30s
+        //   
+        //   
+        //   reconnectTimeoutRef.current = setTimeout(() => {
+        //     connectWebSocket();
+        //   }, delay);
+        // }
       };
       
       socketRef.current = ws;
@@ -127,7 +127,8 @@ const useWebSocket = ({ onMessage, onConnect, onDisconnect }) => {
   }, [user, cleanupConnection]);
 
   useEffect(() => {
-    connectWebSocket();
+    // WebSocket connection temporarily disabled
+    // connectWebSocket();
     
     return () => {
       cleanupConnection();
