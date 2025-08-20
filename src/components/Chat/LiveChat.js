@@ -161,7 +161,11 @@ const LiveChat = () => {
       </div>
 
       <div className="border-t p-3 flex-shrink-0">
-        {user ? (
+        {/* Live chat messaging temporarily disabled */}
+        <div className="text-center text-gray-500 py-2 bg-gray-50 rounded-lg">
+          Live chat messaging is temporarily disabled
+        </div>
+        {/* {user ? (
           <form onSubmit={handleSendMessage} className="flex space-x-2">
             <input
               type="text"
@@ -205,7 +209,7 @@ const LiveChat = () => {
           <div className="text-center text-gray-500 py-2">
             Please login to participate in chat
           </div>
-        )}
+        )} */}
       </div>
 
       {showSuperChatModal && (
