@@ -31,9 +31,20 @@ const GoogleAuthButton = () => {
         throw new Error('Invalid response from backend');
       }
     } catch (err) {
-      console.error('Backend error:', err);
-      toast.error('Login failed. Please try again.');
-    }
+        if (err.response && err.response.data) {
+          const errorData = err.response.data;
+          if (typeof errorData.error === 'string') {
+            toast.error(errorData.error);
+          } else if (typeof errorData.message === 'string') {
+            toast.error(errorData.message);
+          } else {
+            toast.error('An unknown error occurred. Please try again.');
+          }
+        } else {
+          console.error('Backend error:', err);
+          toast.error('Login failed. Please try again.');
+        }
+      }
   };
 
   const handleError = () => {
