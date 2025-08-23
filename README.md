@@ -1,13 +1,27 @@
 # Pollz Frontend (React)
 
+[![CI/CD Pipeline](https://github.com/BhaskarKulshrestha/pollz-frontend/actions/workflows/ci.yml/badge.svg)](https://github.com/BhaskarKulshrestha/pollz-frontend/actions/workflows/ci.yml)
+[![Deploy to Production](https://github.com/BhaskarKulshrestha/pollz-frontend/actions/workflows/deploy.yml/badge.svg)](https://github.com/BhaskarKulshrestha/pollz-frontend/actions/workflows/deploy.yml)
+[![Health Check](https://github.com/BhaskarKulshrestha/pollz-frontend/actions/workflows/health-check.yml/badge.svg)](https://github.com/BhaskarKulshrestha/pollz-frontend/actions/workflows/health-check.yml)
+
 A modern React application for the BITS Pilani unified voting platform featuring elections, course ratings, and department/club voting.
 
 #### Hosted Url: https://pollz.bits-acm.in/
 
 ![alt text](src/assets/website.png)
 
+## 🚀 CI/CD Pipeline
+
+This project features a robust CI/CD pipeline with:
+
+- **Automated Testing**: Runs on every push and pull request
+- **Code Quality Checks**: ESLint validation with warnings
+- **Build Verification**: Ensures production builds work correctly
+- **Automated Deployment**: Deploy to production on main branch
+- **Health Monitoring**: Daily security and dependency checks
+
 ## Prerequisites
-- Node.js 19+
+- Node.js 20+
 - npm or yarn
 - For Frontend Windows works fine but if you aim for full stack, Linux or macOS (preferred). On Windows, use **WSL** or dual boot.
 

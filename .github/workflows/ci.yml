@@ -2,59 +2,71 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop, feature_Github_Actions ]
+    branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
 
 jobs:
-  test-and-build:
+  quality-check:
+    name: Code Quality & Tests
     runs-on: ubuntu-latest
     
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-    
-    steps:
-    - name: Checkout code
+    steps:name: C
+    - heckout code
       uses: actions/checkout@v4
       
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: '20.x'
         cache: 'npm'
         
     - name: Install dependencies
       run: npm ci
       
-    - name: Run linting (optional)
-      run: npm run lint:check || echo "Linting completed with warnings"
+    - name: Run linting
+      run: npm run lint:check
+      continue-on-error: true
       
-    - name: Run tests
+    - name: Run tests with coverage
       run: npm run test:ci
       env:
         CI: true
+
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: quality-check
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
         
-    - name: Build application
+    - name: Install dependencies
+      run: npm ci
+        
+    - name: Build for production
       run: npm run build
       env:
         CI: false
-        REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL || 'http://localhost:8000/api' }}
+        REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL || 'https://api.pollz.app' }}
         
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: build-files-${{ matrix.node-version }}
+        name: production-build
         path: build/
-        retention-days: 7
+        retention-days: 30
         
-    - name: Upload coverage reports (optional)
-      uses: codecov/codecov-action@v3
-      if: matrix.node-version == '20.x'
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./coverage/lcov.info
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: false
-      continue-on-error: true
+    - name: Build summary
+      run: |
+        echo "Build completed successfully" >> $GITHUB_STEP_SUMMARY
+        echo "Artifacts uploaded: production-build" >> $GITHUB_STEP_SUMMARY
+        echo "Build size:" >> $GITHUB_STEP_SUMMARY
+        du -sh build/ >> $GITHUB_STEP_SUMMARY

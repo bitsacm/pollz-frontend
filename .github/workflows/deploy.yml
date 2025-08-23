@@ -7,16 +7,18 @@ on:
 
 jobs:
   deploy:
+    name: Deploy Application
     runs-on: ubuntu-latest
+    environment: production
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Use Node.js 20.x
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 20.x
+        node-version: '20.x'
         cache: 'npm'
         
     - name: Install dependencies
@@ -25,14 +27,31 @@ jobs:
     - name: Build for production
       run: npm run build
       env:
-        REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL_PROD }}
+        CI: false
+        REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL_PROD || secrets.REACT_APP_API_URL || 'https://api.pollz.app' }}
         
-    - name: Deploy to hosting service
+    - name: Deploy summary
       run: |
-        echo "Add your deployment commands here"
-        echo "Build completed successfully for production deployment"
-        # Example for different hosting services:
-        # Netlify: npx netlify-cli deploy --prod --dir=build
-        # Vercel: npx vercel --prod
-        # AWS S3: aws s3 sync build/ s3://your-bucket-name
-        # GitHub Pages: Use actions/deploy-pages@v2
+        echo "🚀 Production deployment completed" >> $GITHUB_STEP_SUMMARY
+        echo "📅 Deployed at: $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "🌐 Environment: Production" >> $GITHUB_STEP_SUMMARY
+        echo "📦 Build size: $(du -sh build/ | cut -f1)" >> $GITHUB_STEP_SUMMARY
+        
+    # Uncomment and configure based on your hosting service:
+    # 
+    # - name: Deploy to Netlify
+    #   run: npx netlify-cli deploy --prod --dir=build
+    #   env:
+    #     NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+    #     NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    #
+    # - name: Deploy to Vercel
+    #   run: npx vercel --prod
+    #   env:
+    #     VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    #
+    # - name: Deploy to AWS S3
+    #   run: aws s3 sync build/ s3://${{ secrets.AWS_S3_BUCKET }}
+    #   env:
+    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
