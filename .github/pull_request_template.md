@@ -6,32 +6,67 @@ Describe the changes you have made, including any refactoring or feature additio
 
 ## 📦 Dependencies
 
-List any dependencies or related PRs (e.g., "Depends on #123").
+**Core Actions**
+
+`actions/checkout@v4` - For code checkout
+`actions/setup-node@v4` - For Node.js environment setup
+`actions/upload-artifact@v4` - For build artifact storage
+
+**Runtime Dependencies**
+
+`Node.js: 20.x` (specified in workflow)
+`npm`: Used for package management and caching
+`Ubuntu`: ubuntu-latest runner environment
+
+**Project Dependencies**
+
+Required npm Scripts (from package.json):
+
+`npm run lint:check` - ESLint code quality checks
+`npm run test:ci `- Jest test execution with CI configuration
+`npm run build` - React production build
+
+**Environment Variables**
+
+`CI=true` - For test execution
+`CI=false` - For build process
+`REACT_APP_API_URL` - API endpoint configuration (uses secret or default)
 
 ## 🐛 Related Issues
 
-Link any issues that are resolved or affected by this PR. Use "Fixes #123" or "Closes #123" to automatically close issues when PR is merged.
+The issue is related to: Add GitHub Actions CI/CD pipeline #5, 
+[github issue link]("https://github.com/bitsacm/pollz-frontend/issues/5")
 
 ## 📋 Checklist
 
-- [ ] I have tested my changes locally
-- [ ] I have updated documentation if necessary
-- [ ] My code follows the project's coding standards
-- [ ] I have tested on multiple screen sizes (responsive design)
-- [ ] I have updated package.json if new dependencies were added
-- [ ] Environment variables are properly configured
-- [ ] All components are properly styled with Tailwind CSS
-- [ ] Authentication flows work correctly
-- [ ] All tests pass locally (`npm test`)
-- [ ] Code passes linting (`npm run lint:check`)
-- [ ] Build succeeds (`npm run build`)
+- [X] I have tested my changes locally
+- [X] I have updated documentation if necessary
+- [X] My code follows the project's coding standards
+- [X] I have tested on multiple screen sizes (responsive design)
+- [X] I have updated package.json if new dependencies were added
+- [X] Environment variables are properly configured
+- [X] All components are properly styled with Tailwind CSS
+- [X] Authentication flows work correctly
+- [X] All tests pass locally (`npm test`)
+- [X] Code passes linting (`npm run lint:check`)
+- [X] Build succeeds (`npm run build`)
 
 ## 🚀 CI/CD Status
 
-- [ ] All GitHub Actions checks pass
-- [ ] Build artifacts are generated successfully
-- [ ] No security vulnerabilities detected
+- [X] All GitHub Actions checks pass
+- [X] Build artifacts are generated successfully
+- [X] No security vulnerabilities detected
 
 ## 📝 Additional Notes
 
-Any additional context, breaking changes, or notes for reviewers.
+**Dependency chain for demonstration of the gihub action workflow.**
+```
+graph LR
+    A[Push/PR] --> B[CI Workflow]
+    B --> C[Install Dependencies]
+    C --> D[Lint Code]
+    D --> E[Run Tests]
+    E --> F[Build App]
+    F --> G[Upload Artifacts]
+    G --> H[Deploy Workflow]
+```
