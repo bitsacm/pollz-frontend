@@ -32,10 +32,10 @@ jobs:
         
     - name: Deploy summary
       run: |
-        echo "🚀 Production deployment completed" >> $GITHUB_STEP_SUMMARY
-        echo "📅 Deployed at: $(date)" >> $GITHUB_STEP_SUMMARY
-        echo "🌐 Environment: Production" >> $GITHUB_STEP_SUMMARY
-        echo "📦 Build size: $(du -sh build/ | cut -f1)" >> $GITHUB_STEP_SUMMARY
+        echo "- Production deployment completed" >> $GITHUB_STEP_SUMMARY
+        echo "- Deployed at: $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "- Environment: Production" >> $GITHUB_STEP_SUMMARY
+        echo "- Build size: $(du -sh build/ | cut -f1)" >> $GITHUB_STEP_SUMMARY
         
     # Uncomment and configure based on your hosting service:
     # 
