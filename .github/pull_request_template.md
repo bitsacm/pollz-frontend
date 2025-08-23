@@ -22,6 +22,15 @@ Link any issues that are resolved or affected by this PR. Use "Fixes #123" or "C
 - [ ] Environment variables are properly configured
 - [ ] All components are properly styled with Tailwind CSS
 - [ ] Authentication flows work correctly
+- [ ] All tests pass locally (`npm test`)
+- [ ] Code passes linting (`npm run lint:check`)
+- [ ] Build succeeds (`npm run build`)
+
+## 🚀 CI/CD Status
+
+- [ ] All GitHub Actions checks pass
+- [ ] Build artifacts are generated successfully
+- [ ] No security vulnerabilities detected
 
 ## 📝 Additional Notes
 
