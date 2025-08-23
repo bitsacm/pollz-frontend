@@ -49,9 +49,9 @@ jobs:
     - name: CI Summary
       if: always()
       run: |
-        echo "## CI/CD Pipeline Results 🚀" >> $GITHUB_STEP_SUMMARY
-        echo "- ✅ Dependencies installed" >> $GITHUB_STEP_SUMMARY
-        echo "- ✅ Code linted" >> $GITHUB_STEP_SUMMARY  
-        echo "- ✅ Tests passed" >> $GITHUB_STEP_SUMMARY
-        echo "- ✅ Build completed" >> $GITHUB_STEP_SUMMARY
-        echo "- 📦 Artifacts uploaded" >> $GITHUB_STEP_SUMMARY
+        echo "## CI/CD Pipeline Results " >> $GITHUB_STEP_SUMMARY
+        echo "-Dependencies installed" >> $GITHUB_STEP_SUMMARY
+        echo "-Code linted" >> $GITHUB_STEP_SUMMARY  
+        echo "-Tests passed" >> $GITHUB_STEP_SUMMARY
+        echo "-Build completed" >> $GITHUB_STEP_SUMMARY
+        echo "-Artifacts uploaded" >> $GITHUB_STEP_SUMMARY
