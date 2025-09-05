@@ -50,9 +50,11 @@ const SUElection = () => {
               <option value={2025}>2025</option>
               <option value={2024}>2024 (Results)</option>
             </select>
-            <span className="text-sm font-semibold text-theme-accent-yellow">
-              Total Votes: {totalVotes}
-            </span>
+            <div className="flex items-center gap-4 text-sm font-semibold text-theme-accent-yellow">
+              <span>President Votes: {electionStats?.president?.total_votes || 0}</span>
+              <span>Gensec Votes: {electionStats?.gensec?.total_votes || 0}</span>
+              <span>Total Logged in Users: {electionStats?.total_voters || 0}</span>
+            </div>
           </div>
 
           {selectedYear === 2025 && (

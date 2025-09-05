@@ -28,9 +28,9 @@ const LiveChat = () => {
   });
 
   useEffect(() => {
-    fetchSuperChats();
-    const interval = setInterval(fetchSuperChats, 30000);
-    return () => clearInterval(interval);
+    // fetchSuperChats();
+    // const interval = setInterval(fetchSuperChats, 30000);
+    // return () => clearInterval(interval);
   }, []);
 
   const fetchRecentMessages = async () => {
@@ -45,12 +45,12 @@ const LiveChat = () => {
   };
 
   const fetchSuperChats = async () => {
-    try {
-      const response = await api.get('/superchat/get-super-chats/');
-      setSuperChats(response.data);
-    } catch (error) {
-      console.error('Error fetching superchats:', error);
-    }
+    // try {
+    //   const response = await api.get('/superchat/get-super-chats/');
+    //   setSuperChats(response.data);
+    // } catch (error) {
+    //   console.error('Error fetching superchats:', error);
+    // }
   };
 
   const handleSendMessage = (e) => {
@@ -85,7 +85,7 @@ const LiveChat = () => {
       amount: superchat.amount
     });
     setShowSuperChatModal(false);
-    fetchSuperChats();
+    // fetchSuperChats();
     toast.success('SuperChat sent successfully!');
   };
 
