@@ -62,9 +62,12 @@ const useWebSocket = ({ onMessage, onConnect, onDisconnect }) => {
     cleanupConnection();
 
     try {
-      const ws = new WebSocket(`${WEBSOCKET_URL}/ws/chat/live?user_id=${user?.id || ''}&username=${user?.email?.split('@')[0] || 'Anonymous'}`);
+      const wsUrl = `${WEBSOCKET_URL}/ws/chat/live?user_id=${user?.id || ''}&username=${user?.email?.split('@')[0] || 'Anonymous'}`;
+      console.log('Connecting to WebSocket:', wsUrl);
+      const ws = new WebSocket(wsUrl);
       
       ws.onopen = () => {
+        console.log('WebSocket connected successfully');
         setIsConnected(true);
         setConnectionStatus('connected');
         reconnectAttemptsRef.current = 0; // Reset counter on successful connection
@@ -74,26 +77,38 @@ const useWebSocket = ({ onMessage, onConnect, onDisconnect }) => {
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
+          console.log('Received WebSocket message:', data);
           
           // Handle special "recent_messages" format from server
-          if (data.type === 'recent_messages' && data.message) {
+          if (data.type === 'recent_messages') {
             try {
-              const recentData = JSON.parse(data.message);
+              let recentData;
+              if (typeof data.content === 'string') {
+                recentData = JSON.parse(data.content);
+              } else if (data.message) {
+                recentData = JSON.parse(data.message);
+              } else {
+                recentData = data;
+              }
+              
               if (recentData.messages && Array.isArray(recentData.messages)) {
+                console.log('Processing recent messages:', recentData.messages.length);
                 // Send each message individually to match expected format
                 recentData.messages.forEach(msg => {
+                  console.log('Adding recent message:', msg);
                   if (onMessageRef.current) onMessageRef.current(msg);
                 });
               }
             } catch (parseError) {
-              console.error('Error parsing recent messages:', parseError);
+              console.error('Error parsing recent messages:', parseError, data);
             }
           } else {
             // Handle normal individual messages
+            console.log('Adding new message:', data);
             if (onMessageRef.current) onMessageRef.current(data);
           }
         } catch (error) {
-          console.error('Error parsing WebSocket message:', error);
+          console.error('Error parsing WebSocket message:', error, event.data);
         }
       };
       
@@ -103,20 +118,22 @@ const useWebSocket = ({ onMessage, onConnect, onDisconnect }) => {
       };
       
       ws.onclose = (event) => {
+        console.log('WebSocket closed:', event.code, event.reason);
         setIsConnected(false);
         setConnectionStatus('disconnected');
         if (onDisconnectRef.current) onDisconnectRef.current();
         
-        // Auto-reconnect temporarily disabled
-        // if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts) {
-        //   reconnectAttemptsRef.current++;
-        //   const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000); // Exponential backoff, max 30s
-        //   
-        //   
-        //   reconnectTimeoutRef.current = setTimeout(() => {
-        //     connectWebSocket();
-        //   }, delay);
-        // }
+        // Auto-reconnect on abnormal closure
+        if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts) {
+          reconnectAttemptsRef.current++;
+          const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000); // Exponential backoff, max 30s
+          
+          console.log(`WebSocket disconnected. Attempting reconnect ${reconnectAttemptsRef.current}/${maxReconnectAttempts} in ${delay}ms`);
+          
+          reconnectTimeoutRef.current = setTimeout(() => {
+            connectWebSocket();
+          }, delay);
+        }
       };
       
       socketRef.current = ws;
@@ -127,8 +144,7 @@ const useWebSocket = ({ onMessage, onConnect, onDisconnect }) => {
   }, [user, cleanupConnection]);
 
   useEffect(() => {
-    // WebSocket connection temporarily disabled
-    // connectWebSocket();
+    connectWebSocket();
     
     return () => {
       cleanupConnection();

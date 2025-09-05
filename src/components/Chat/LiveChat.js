@@ -17,13 +17,21 @@ const LiveChat = () => {
   
   const { sendMessage, isConnected, connectionStatus, manualReconnect } = useWebSocket({
     onMessage: (message) => {
-      setMessages(prev => [...prev, message]);
+      console.log('LiveChat received message:', message);
+      setMessages(prev => {
+        console.log('Previous messages:', prev.length);
+        const updated = [...prev, message];
+        console.log('Updated messages:', updated.length);
+        return updated;
+      });
       scrollToBottom();
     },
     onConnect: () => {
+      console.log('WebSocket connected in LiveChat');
       fetchRecentMessages();
     },
     onDisconnect: () => {
+      console.log('WebSocket disconnected in LiveChat');
     }
   });
 
@@ -33,12 +41,18 @@ const LiveChat = () => {
     // return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const fetchRecentMessages = async () => {
     try {
       // Recent messages will come through WebSocket connection, not HTTP API
       // This function is called onConnect, but recent messages are sent automatically
       // by the WebSocket server when client connects, so we don't need to fetch separately
       console.log('WebSocket connected - waiting for recent messages...');
+      // Clear messages when reconnecting to avoid duplicates
+      setMessages([]);
     } catch (error) {
       console.error('Error in fetchRecentMessages:', error);
     }
@@ -90,11 +104,13 @@ const LiveChat = () => {
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg flex flex-col h-full">
+    <div className="bg-white rounded-lg shadow-lg flex flex-col" style={{ height: '600px' }}>
       <div className="bg-theme-accent-yellow text-theme-black p-3 rounded-t-lg flex-shrink-0">
         <h2 className="text-lg font-bold flex items-center">
           <FiMessageCircle className="mr-2" />
@@ -132,74 +148,29 @@ const LiveChat = () => {
         </h2>
       </div>
 
-      {superChats.length > 0 && (
-        <div className="bg-gradient-to-r from-yellow-100 to-orange-100 p-2 border-b flex-shrink-0">
-          <div className="text-xs font-semibold text-gray-700 mb-1">Top SuperChats</div>
-          <div className="space-y-1 max-h-20 overflow-y-auto">
-            {superChats.slice(0, 2).map((sc, idx) => (
-              <div key={idx} className="flex items-center justify-between bg-white bg-opacity-70 rounded p-1">
-                <span className="text-xs font-medium truncate">{sc.message}</span>
-                <span className="text-xs font-bold text-orange-600">₹{sc.amount}</span>
-              </div>
-            ))}
-          </div>
+      <div className="bg-blue-50 border-b p-2 flex-shrink-0">
+        <div className="text-xs text-blue-800">
+          <span className="font-semibold">ℹ️ Chat Info:</span> All messages are completely anonymous. 
+          Inappropriate words are censored. Mods will remove personal targeted messages.
         </div>
-      )}
+      </div>
 
       <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0">
-        {/* Chat temporarily disabled - show callout message */}
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <FiMessageCircle className="h-5 w-5 text-yellow-400" />
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-yellow-800">Chat is temporarily disabled</h3>
-              <div className="mt-2 text-sm text-yellow-700">
-                <p className="mb-2">
-                  <strong>Discussion:</strong> Need to decide on chat functionality. 
-                  Should users chat anonymously or display their names/emails to prevent spam?
-                </p>
-                <p>
-                  Provide your input here: 
-                  <a href="https://github.com/bitsacm/pollz-frontend/issues/26" 
-                     className="text-yellow-800 underline hover:text-yellow-900" 
-                     target="_blank" 
-                     rel="noopener noreferrer">
-                    Frontend Issue #26
-                  </a>
-                </p>
-                <p></p>
-                <p className="my-2">Also We're working on this issue: 
-                  <a href="https://github.com/bitsacm/pollz-websocket/issues/3" 
-                     className="text-yellow-800 underline hover:text-yellow-900" 
-                     target="_blank" 
-                     rel="noopener noreferrer">
-                    WebSocket Issue #3
-                  </a>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Uncomment this section when re-enabling chat */}
-        {/* {messages.length === 0 ? (
+        {messages.length === 0 ? (
           <div className="text-center text-gray-500 py-8">
             <FiMessageCircle className="text-3xl mx-auto mb-2 text-gray-300" />
             <p className="text-sm">No messages yet. Be the first to chat!</p>
           </div>
         ) : (
           messages.map((msg, index) => (
-            <ChatMessage key={index} message={msg} />
+            <ChatMessage key={msg.ID || msg.id || `msg-${index}-${Date.now()}`} message={msg} />
           ))
-        )} */}
+        )}
         <div ref={messagesEndRef} />
       </div>
 
       <div className="border-t p-3 flex-shrink-0">
-        {/* Uncomment this section when re-enabling chat */}
-        {/* {user ? (
+        {user ? (
           <form onSubmit={handleSendMessage} className="flex space-x-2">
             <input
               type="text"
@@ -243,7 +214,7 @@ const LiveChat = () => {
           <div className="text-center text-gray-500 py-2">
             Please login to participate in chat
           </div>
-        )} */}
+        )}
       </div>
 
       {showSuperChatModal && (

@@ -21,9 +21,9 @@ const ChatMessage = ({ message }) => {
             ₹{message.amount}
           </span>
         </div>
-        <p className="text-white font-medium">{message.message}</p>
+        <p className="text-white font-medium">{message.message || message.content}</p>
         <span className="text-xs text-yellow-100">
-          {new Date(message.created_at).toLocaleTimeString()}
+          {new Date(message.created_at || message.CreatedAt).toLocaleTimeString()}
         </span>
       </motion.div>
     );
@@ -44,10 +44,10 @@ const ChatMessage = ({ message }) => {
             {message.username || 'Anonymous'}
           </span>
           <span className="text-xs text-gray-500">
-            {new Date(message.created_at).toLocaleTimeString()}
+            {new Date(message.created_at || message.CreatedAt).toLocaleTimeString()}
           </span>
         </div>
-        <p className="text-gray-800 text-sm mt-1">{message.message}</p>
+        <p className="text-gray-800 text-sm mt-1">{message.message || message.content}</p>
       </div>
     </motion.div>
   );
