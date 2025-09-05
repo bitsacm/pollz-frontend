@@ -38,22 +38,24 @@ const SUElection = () => {
       
       <div className="py-4 flex-shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center items-center gap-4 mb-4">
-            <h1 className="text-2xl font-bold text-theme-black">
-              Student Union Elections
-            </h1>
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-              className="bg-white border border-gray-300 rounded px-3 py-1 text-sm text-theme-black focus:ring-2 focus:ring-theme-accent-yellow focus:border-transparent"
-            >
-              <option value={2025}>2025</option>
-              <option value={2024}>2024 (Results)</option>
-            </select>
-            <div className="flex items-center gap-4 text-sm font-semibold text-theme-accent-yellow">
-              <span>President Votes: {electionStats?.president?.total_votes || 0}</span>
-              <span>Gensec Votes: {electionStats?.gensec?.total_votes || 0}</span>
-              <span>Total Logged in Users: {electionStats?.total_voters || 0}</span>
+          <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-4">
+            <div className="flex items-center gap-4">
+              <h1 className="text-xl md:text-2xl font-bold text-theme-black">
+                Student Union Elections
+              </h1>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                className="bg-white border border-gray-300 rounded px-3 py-1 text-sm text-theme-black focus:ring-2 focus:ring-theme-accent-yellow focus:border-transparent"
+              >
+                <option value={2025}>2025</option>
+                <option value={2024}>2024 (Results)</option>
+              </select>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-xs sm:text-sm font-semibold text-theme-accent-yellow">
+              <span className="whitespace-nowrap">President Votes: {electionStats?.president?.total_votes || 0}</span>
+              <span className="whitespace-nowrap">Gensec Votes: {electionStats?.gensec?.total_votes || 0}</span>
+              <span className="whitespace-nowrap">Total Logged in Users: {electionStats?.total_voters || 0}</span>
             </div>
           </div>
 
